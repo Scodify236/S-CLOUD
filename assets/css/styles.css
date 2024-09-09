@@ -1,8 +1,84 @@
-.fit-content {
-  width: fit-content;
-  width: -moz-fit-content;
+/* Base styles */
+body {
+  font-family: 'JetBrains Mono', monospace;
+  background: linear-gradient(to bottom right, #5e35b1, #3949ab, #1e88e5);
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
 }
 
+/* Glassy effect */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Layout */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.nav-link {
+  color: #ffffff;
+  text-decoration: none;
+  margin-right: 20px;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #1ed760;
+}
+
+/* Main content */
+.main-content {
+  display: flex;
+  margin-top: 20px;
+}
+
+.sidebar {
+  width: 240px;
+  padding: 20px;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+}
+
+/* Buttons */
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 50px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #1ed760;
+  color: #000000;
+}
+
+.btn-primary:hover {
+  background-color: #1fdf64;
+}
+
+/* Player */
 #audio-player {
   right: 0px;
   left: 0px;
@@ -11,50 +87,64 @@
   padding: 20px;
   font-family: 'JetBrains Mono', monospace;
 }
-.song-image {
-  width: 110px;border-top-left-radius: 30px;height: 114px;
-}
-.song-text {
-  margin: 0px;color: rgb(172,248,159);max-width: 100%;
-}
+
 .song-container {
-  margin-bottom: 20px;border-bottom-right-radius: 30px;border: 2px solid var(--gray);border-bottom-style: solid;border-top-left-radius: 30px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+  border: none;
 }
+
+.song-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 5px;
+  margin-right: 15px;
+}
+
+.song-text {
+  color: #ffffff;
+  margin: 0;
+}
+
+/* Custom audio player styles */
 audio::-webkit-media-controls-panel {
-  background-color: #ff9f44af;
+  background-color: transparent;
 }
 
-a.nav-link {
-  color: #f58723;
+audio::-webkit-media-controls-play-button,
+audio::-webkit-media-controls-mute-button {
+  background-color: #1ed760;
+  border-radius: 50%;
 }
 
-.footer-basic {
-  padding: 40px 0;
-  background-color: #ffffff;
-  color: #4b4c4d;
+/* Responsive design */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    margin-bottom: 20px;
+  }
 }
 
-.header-dark {
-  background-size: cover;
+/* Additional styles from the provided CSS */
+.fit-content {
+  width: fit-content;
+  width: -moz-fit-content;
 }
 
-.header-dark h1 {
-  color: #fff;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 40px;
-  padding-top: 60px;
-}
-
-/* Highlight Clean */
 .highlight-clean {
   color: #313437;
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   padding: 50px 0;
-  font-family: 'JetBrains Mono', monospace;
 }
 
 .highlight-clean p {
-  color: #7d8285;
+  color: #e0e0e0;
 }
 
 .highlight-clean h2 {
@@ -90,7 +180,6 @@ a.nav-link {
   letter-spacing: 0.4px;
   line-height: 1;
   outline: none;
-  background-color: #ddd;
 }
 
 .highlight-clean .buttons .btn:hover {
@@ -102,27 +191,18 @@ a.nav-link {
 }
 
 .highlight-clean .buttons .btn-primary {
-  background-color: #055ada;
-  color: #fff;
-}
-
-.text-center {
-  margin: 10px 0 15px;
-}
-
-#saavn-bitrate {
-  background-color: #1c1c1c;
-  color: #fff;
-  border: 0;
-  border-radius: 5px;
-  padding: 10px;
+  background-color: #1ed760;
+  color: #000000;
 }
 
 footer {
   color: rgba(255, 255, 255, 0.753);
-  font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
+  text-align: center;
+  padding: 20px 0;
 }
+
 .error {
- margin : 20px;
+  margin: 20px;
+  color: #ff5252;
 }
