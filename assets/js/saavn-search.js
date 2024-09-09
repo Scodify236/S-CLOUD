@@ -79,22 +79,34 @@ if (bitrate_i == 4) {quality = 320} else {quality = 160;}
         track: track
     };
       results.push(`
-      <div class="text-left song-container" style="margin-bottom:20px;border-radius:10px;background-color:#1c1c1c;padding:10px;">
-      <div class="row" style="margin:auto;">
-          <div class="col-auto" style="padding:0px;padding-right:0px;border-style:none;">
-              <img id="${song_id}-i" class="img-fluid d-inline" style="width:115px;border-radius:5px;height:115px;padding-right:10px;" src="${song_image}" loading="lazy"/>
-          </div>
-          <div class="col" style="border-style:none;padding:2px;">
-              <p class="float-right fit-content" style="margin:0px;color:#fff;padding-right:10px;">${year}</p>
-              <p id="${song_id}-n" class="fit-content" style="margin:0px;color:#fff;max-width:100%;">${song_name}</p>
-              <p id="${song_id}-a" class="fit-content" style="margin:0px;color:#fff;max-width:100%;">${album_name}<br/></p>
-              <p id="${song_id}-ar" class="fit-content" style="margin:0px;color:#fff;max-width:100%;">${song_artist}<br/></p>
-              <button class="btn btn-primary song-btn" type="button" style="margin:0px 2px;" onclick='PlayAudio("${download_url}","${song_id}")'>▶</button>
-              <button class="btn btn-primary song-btn" type="button" style="margin:0px 2px;" onclick='AddDownload("${song_id}")'>DL</button>
-              <p class="float-right fit-content" style="margin:0px;color:#fff;padding-right:10px;padding-top:15px;">${play_time}<br/></p>
-          </div>
-      </div>
-  </div>
+      <div class="song-container" style="margin-bottom: 8px; padding: 16px; background-color: #181818; border-radius: 4px; display: flex; align-items: center; transition: background-color 0.3s;">
+    <div class="song-image" style="margin-right: 16px; flex-shrink: 0;">
+        <img id="${song_id}-i" src="${song_image}" alt="Album cover" style="width: 64px; height: 64px; border-radius: 4px; object-fit: cover;">
+    </div>
+    <div class="song-info" style="flex-grow: 1; min-width: 0;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
+            <p id="${song_id}-n" class="song-name" style="margin: 0; color: #fff; font-size: 16px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${song_name}</p>
+            <p class="song-year" style="margin: 0; color: #a7a7a7; font-size: 14px;">${year}</p>
+        </div>
+        <p id="${song_id}-ar" class="song-artist" style="margin: 0 0 2px; color: #b3b3b3; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${song_artist}</p>
+        <p id="${song_id}-a" class="album-name" style="margin: 0; color: #a7a7a7; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${album_name}</p>
+    </div>
+    <div class="song-controls" style="margin-left: 16px;">
+        <button class="play-button" onclick='PlayAudio("${download_url}","${song_id}")' style="background-color: #1db954; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background-color 0.3s;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#000000">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+        </button>
+    </div>
+</div>
+<style>
+.song-container:hover {
+    background-color: #282828;
+}
+.play-button:hover {
+    background-color: #1ed760;
+}
+</style>
 `
 ); }
     }
@@ -120,7 +132,7 @@ function TextAbstract(text, length) {
 }
 if(window.location.hash) {
    doSaavnSearch(window.location.hash.substring(1));
-} else {doSaavnSearch('english',1);}
+} else {doSaavnSearch('punjabi',1);}
 
 addEventListener('hashchange', event => { });
 onhashchange = event => {doSaavnSearch(window.location.hash.substring(1))};
