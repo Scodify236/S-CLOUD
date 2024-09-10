@@ -132,7 +132,7 @@ function TextAbstract(text, length) {
 }
 if(window.location.hash) {
    doSaavnSearch(window.location.hash.substring(1));
-} else {doSaavnSearch('english',1);}
+} else {doSaavnSearch('punjabi',1);}
 
 addEventListener('hashchange', event => { });
 onhashchange = event => {doSaavnSearch(window.location.hash.substring(1))};
