@@ -18,7 +18,7 @@ body {
     background-color: rgba(26, 32, 44, 0.8);
     backdrop-filter: blur(10px);
     border-radius: 20px;
-    padding: 20px;
+    padding: 25px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 .results-container {
@@ -26,7 +26,7 @@ body {
     backdrop-filter: blur(10px);
     color: #e2e8f0;
     border-radius: 20px;
-    padding: 20px;
+    padding: 25px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 .player {
@@ -264,11 +264,10 @@ button:hover {
                 <option value="4">320 kbps</option>
                 <option value="3">160 kbps</option>
             </select>
+            <button id="loadmore" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded transition duration-300 shadow">Load More</button>
         </div>
 
         <div id="saavn-results" class="results-container rounded-lg p-4 overflow-y-auto custom-scrollbar shadow-lg" style="max-height: 60vh;"></div>
-
-        <button id="loadmore" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded transition duration-300 shadow">Load More</button>
     </main>
 
     <footer class="player fixed bottom-0 left-0 right-0 p-4 shadow-lg">
