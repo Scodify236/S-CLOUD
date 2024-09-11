@@ -7,46 +7,56 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
 body {
-    background-color: #f0f0f0;
-    color: #333;
+    background-color: #1a202c;
+    color: #e2e8f0;
     font-family: 'Arial', sans-serif;
 }
 .gradient-background {
-    background: linear-gradient(135deg, #79aed1, #2c3e50);
+    background: linear-gradient(135deg, #2d3748, #1a202c);
 }
 .search-container {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(26, 32, 44, 0.8);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 .results-container {
-    background-color: rgba(44, 62, 80, 0.8);
+    background-color: rgba(44, 55, 72, 0.8);
     backdrop-filter: blur(10px);
-    color: #ecf0f1;
+    color: #e2e8f0;
     border-radius: 20px;
     padding: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 .player {
-    background-color: rgba(43, 111, 179, 0.9);
+    background-color: rgba(26, 32, 44, 0.9);
     backdrop-filter: blur(10px);
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
+    position: fixed;
+    padding: 20px;
+    padding-top: 26px; /* Increased to accommodate progress bar */
 }
 .progress-bar {
-    background-color: #bdc3c7;
+    background-color: #4a5568;
     cursor: pointer;
     height: 6px;
-    border-radius: 3px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
 }
 .progress {
-    background-color: #3498db;
-    border-radius: 3px;
+    background-color: #4299e1;
+    height: 100%;
+    border-top-left-radius: 20px;
+    transition: width 0.1s linear;
 }
 .control-button {
-    background-color: #3498db;
+    background-color: #4299e1;
     transition: all 0.2s;
     border-radius: 50%;
     width: 48px;
@@ -56,53 +66,53 @@ body {
     align-items: center;
 }
 .control-button:hover {
-    background-color: #2980b9;
+    background-color: #3182ce;
     transform: scale(1.1);
 }
 .song-container {
     transition: all 0.3s;
-    background-color: rgba(52, 152, 219, 0.1);
+    background-color: rgba(66, 153, 225, 0.1);
     border-radius: 15px;
     margin-bottom: 12px;
     padding: 16px;
 }
 .song-container:hover {
-    background-color: rgba(52, 152, 219, 0.3);
+    background-color: rgba(66, 153, 225, 0.3);
     transform: translateY(-4px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: #bdc3c7 #2c3e50;
+    scrollbar-color: #4a5568 #2d3748;
 }
 .custom-scrollbar::-webkit-scrollbar {
     width: 8px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: #2c3e50;
+    background: #2d3748;
     border-radius: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: #bdc3c7;
+    background-color: #4a5568;
     border-radius: 4px;
 }
 .lofi-toggle {
-    background-color: #bdc3c7;
+    background-color: #4a5568;
     transition: all 0.3s;
     border-radius: 15px;
     padding: 2px;
 }
 .lofi-toggle.active {
-    background-color: #3498db;
+    background-color: #4299e1;
 }
 .lofi-toggle-knob {
-    background-color: #fff;
+    background-color: #e2e8f0;
     transition: all 0.3s;
     border-radius: 50%;
 }
 header {
-    background-color: rgba(44, 62, 80, 0.9);
-    color: #ecf0f1;
+    background-color: rgba(26, 32, 44, 0.9);
+    color: #e2e8f0;
     padding: 15px 20px;
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
@@ -112,25 +122,25 @@ header img {
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #ecf0f1;
+    border: 2px solid #e2e8f0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 input[type="text"], select {
-    background-color: #ecf0f1;
-    border: 2px solid #bdc3c7;
-    color: #2c3e50;
+    background-color: #2d3748;
+    border: 2px solid #4a5568;
+    color: #e2e8f0;
     border-radius: 10px;
     padding: 10px 15px;
     transition: all 0.3s;
 }
 input[type="text"]:focus, select:focus {
-    border-color: #3498db;
+    border-color: #4299e1;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
 }
 button {
-    background-color: #3498db;
-    color: #fff;
+    background-color: #4299e1;
+    color: #e2e8f0;
     transition: all 0.3s;
     border-radius: 10px;
     padding: 10px 20px;
@@ -139,29 +149,29 @@ button {
     letter-spacing: 1px;
 }
 button:hover {
-    background-color: #2980b9;
+    background-color: #3182ce;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 #player-name {
-    color: #ecf0f1;
+    color: #e2e8f0;
     font-weight: bold;
     font-size: 1.1em;
 }
 #player-album {
-    color: #bdc3c7;
+    color: #a0aec0;
     font-size: 0.9em;
 }
 #player-image {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     border-radius: 10px;
     width: 64px;
     height: 64px;
     object-fit: cover;
 }
 #loadmore {
-    background-color: #3498db;
-    color: #fff;
+    background-color: #4299e1;
+    color: #e2e8f0;
     transition: all 0.3s;
     border-radius: 10px;
     padding: 12px 24px;
@@ -171,9 +181,9 @@ button:hover {
     margin-top: 20px;
 }
 #loadmore:hover {
-    background-color: #2980b9;
+    background-color: #3182ce;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Mobile Optimizations */
@@ -204,7 +214,15 @@ button:hover {
     }
     .player {
         padding: 10px;
+        padding-top: 16px; /* Increase top padding for mobile to accommodate the progress bar */
     }
+    .player-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding-top: 10px; /* Added padding to move controls down */
+}
     #player-image {
         width: 48px;
         height: 48px;
@@ -215,12 +233,20 @@ button:hover {
     #player-album {
         font-size: 0.8em;
     }
-    .control-button {
-        width: 40px;
-        height: 40px;
-    }
+   
+.control-button {
+    background-color: #4299e1;
+    transition: all 0.2s;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 10px;
 }
-    </style>
+}
+</style>
 </head>
 <body class="min-h-screen flex flex-col gradient-background">
     <header class="p-4 flex items-center">
