@@ -176,7 +176,7 @@ function PlayAudio(url, songId) {
 if (window.location.hash) {
     doSaavnSearch(window.location.hash.substring(1));
 } else {
-    doSaavnSearch('punjabi', 1);
+    doSaavnSearch('hndi', 1);
 }
 
 addEventListener('hashchange', event => { });
