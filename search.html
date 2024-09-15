@@ -198,29 +198,23 @@ main {
   color: var(--primary-text);
   cursor: pointer;
   margin: 0 0.5rem;
-}
-
-.lofi-toggle {
-  margin-left: 1rem;
-}
-
-.player-right {
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
   display: flex;
+  justify-content: center;
   align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s;
 }
 
-.time-display {
-  display: flex;
-  font-size: 0.8rem;
-  color: var(--secondary-text);
+.control-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
 }
 
-#current-time {
-  margin-right: 0.5rem;
-}
-
-#duration {
-  margin-left: 0.5rem;
+.control-button:active {
+  animation: pulse 0.3s ease-in-out;
 }
 
 .lofi-toggle {
@@ -246,6 +240,25 @@ main {
 
 .lofi-toggle.active .lofi-toggle-knob {
   transform: translateX(20px);
+}
+
+.player-right {
+  display: flex;
+  align-items: center;
+}
+
+.time-display {
+  display: flex;
+  font-size: 0.8rem;
+  color: var(--secondary-text);
+}
+
+#current-time {
+  margin-right: 0.5rem;
+}
+
+#duration {
+  margin-left: 0.5rem;
 }
 
 nav {
@@ -279,7 +292,6 @@ nav svg {
   margin-bottom: 0.25rem;
 }
 
-/* Custom scrollbar */
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: var(--tertiary-bg) var(--secondary-bg);
@@ -299,7 +311,6 @@ nav svg {
   border: 2px solid var(--secondary-bg);
 }
 
-/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -309,100 +320,20 @@ nav svg {
   animation: fadeIn 0.5s ease-in-out;
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-  main {
-    display: flex;
-    flex-direction: column;
-  }
-
-  #loadmore {
-    order: -1;
-    margin-bottom: 1rem;
-  }
-
-  .player-content {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 0.5rem;
-  }
-
-  .player-controls {
-    margin-top: 0.5rem;
-    justify-content: center;
-  }
-
-  .player-right {
-    margin-top: 0.25rem;
-    justify-content: center;
-  }
-
-  #player-image {
-    width: 40px;
-    height: 40px;
-  }
-
-  .player-info {
-    flex-grow: 1;
-  }
-
-  #player-name {
-    font-size: 0.8rem;
-  }
-
-  #player-album {
-    font-size: 0.7rem;
-  }
-
-  .control-button {
-    width: 40px;
-    height: 40px;
-  }
-
-  .lofi-toggle {
-    width: 32px;
-    height: 16px;
-  }
-
-  .lofi-toggle-knob {
-    width: 12px;
-    height: 12px;
-  }
-
-  .lofi-toggle.active .lofi-toggle-knob {
-    transform: translateX(16px);
-  }
-
-  .time-display {
-    font-size: 0.7rem;
-  }
-}
-
-/* Additional styles from the original CSS */
-.control-button {
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  transition: all 0.3s;
-}
-
-.control-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
-}
-
-.control-button:active {
-  animation: pulse 0.3s ease-in-out;
-}
-
 @keyframes pulse {
   0% { transform: scale(1); }
   50% { transform: scale(1.05); }
   100% { transform: scale(1); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+  100% { transform: translateY(0px); }
+}
+
+.float-animation {
+  animation: float 4s ease-in-out infinite;
 }
 
 ::selection {
@@ -414,16 +345,6 @@ nav svg {
   backdrop-filter: blur(10px);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-3px); }
-  100% { transform: translateY(0px); }
-}
-
-.float-animation {
-  animation: float 4s ease-in-out infinite;
 }
 
 .home-button {
@@ -438,6 +359,137 @@ nav svg {
 
 .home-button:hover {
   background-color: #1ed760;
+}
+
+.control-button {
+  z-index: 10;
+}
+
+main {
+  margin-bottom: 80px;
+}
+
+@media (max-width: 768px) {
+  main {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #loadmore {
+    order: -1;
+    margin-bottom: 1rem;
+  }
+
+  .player-content {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+  }
+
+  .player-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    max-width: calc(100% - 150px); /* Adjusted to accommodate the lofi label */
+  }
+
+  .player-controls {
+    order: 3;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .player-right {
+    order: 2;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  #player-image {
+    width: 40px;
+    height: 40px;
+    margin-right: 0.5rem;
+  }
+
+  .player-info {
+    flex-grow: 1;
+    max-width: calc(100% - 50px);
+  }
+
+  #player-name {
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #player-album {
+    font-size: 0.7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .control-button {
+    width: 36px;
+    height: 36px;
+    margin: 0 0.25rem;
+  }
+
+  .lofi-toggle {
+    width: 32px;
+    height: 16px;
+    margin-left: 0.5rem;
+  }
+
+  .lofi-toggle-knob {
+    width: 12px;
+    height: 12px;
+  }
+
+  .lofi-toggle.active .lofi-toggle-knob {
+    transform: translateX(16px);
+  }
+
+  .time-display {
+    font-size: 0.7rem;
+    display: none; /* Hide time display to save space */
+  }
+
+  .player-right-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: auto;
+  }
+
+  .player-content {
+    justify-content: flex-start;
+  }
+
+  .player-left {
+    margin-right: auto;
+  }
+
+  .player-controls, .lofi-container {
+    margin-left: 0.5rem;
+  }
+
+  /* New styles for lofi label */
+  .lofi-container {
+    display: flex;
+    align-items: center;
+    margin-left: 0.5rem;
+  }
+
+  .lofi-label {
+    font-size: 0.7rem;
+    margin-left: 0.25rem;
+    color: var(--secondary-text);
+  }
 }
     </style>
 </head>
@@ -492,7 +544,7 @@ nav svg {
                 </div>
                 <span class="ml-2 text-sm">Lofi</span>
             </div>
-                <span class="ml-2 text-sm">Lofi</span>
+                <span class="ml-2 text-sm"></span>
             </div>
             <div class="player-right">
                 <div class="time-display">
