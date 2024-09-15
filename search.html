@@ -34,6 +34,9 @@ header {
   background-color: var(--primary-bg);
   padding: 1rem;
   border-bottom: 1px solid var(--tertiary-bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 main {
@@ -63,7 +66,19 @@ main {
 }
 
 #loadmore {
-  display: none;
+  display: block;
+  margin: 1rem auto;
+  padding: 0.5rem 1rem;
+  background-color: var(--accent-color);
+  color: var(--primary-text);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#loadmore:hover {
+  background-color: #1ed760;
 }
 
 .results-container {
@@ -111,7 +126,8 @@ main {
 }
 
 .player {
-  background-color: transparent(5px);
+  background-color: var(--primary-bg);
+  backdrop-filter: blur(10px);
   position: fixed;
   bottom: 0;
   left: 0;
@@ -295,6 +311,16 @@ nav svg {
 
 /* Responsive design */
 @media (max-width: 768px) {
+  main {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #loadmore {
+    order: -1;
+    margin-bottom: 1rem;
+  }
+
   .player-content {
     flex-direction: column;
     align-items: stretch;
@@ -400,59 +426,28 @@ nav svg {
   animation: float 4s ease-in-out infinite;
 }
 
-/* Additional styles from the original CSS */
-.control-button {
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  transition: all 0.3s;
+.home-button {
+  background-color: var(--accent-color);
+  color: var(--primary-text);
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.control-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
-}
-
-.control-button:active {
-  animation: pulse 0.3s ease-in-out;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-::selection {
-  background-color: rgba(29, 185, 84, 0.3);
-}
-
-.glass-effect {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-3px); }
-  100% { transform: translateY(0px); }
-}
-
-.float-animation {
-  animation: float 4s ease-in-out infinite;
+.home-button:hover {
+  background-color: #1ed760;
 }
     </style>
 </head>
 <body class="min-h-screen flex flex-col gradient-background">
-    <header class="p-4 flex items-center">
-        <img src="logo.webp" alt="S-CLOUD Logo" class="w-8 h-8 mr-2">
-        <h1 class="text-2xl font-bold">S-CLOUD</h1>
+    <header class="p-4 flex items-center justify-between">
+        <div class="flex items-center">
+            <img src="logo.webp" alt="S-CLOUD Logo" class="w-8 h-8 mr-2">
+            <h1 class="text-2xl font-bold">S-CLOUD</h1>
+        </div>
+        <a href="index.html" class="home-button">Home</a>
     </header>
 
     <main class="flex-grow p-4">
@@ -465,12 +460,13 @@ nav svg {
                 <option value="4">320 kbps</option>
                 <option value="3">160 kbps</option>
             </select>
-            <button id="loadmore" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded transition duration-300 shadow">Load More</button>
         </div>
 
         <div id="saavn-results" class="results-container rounded-lg p-4 overflow-y-auto custom-scrollbar shadow-lg" style="max-height: 60vh;">
             <!-- Search results will be dynamically inserted here -->
         </div>
+
+        <button id="loadmore" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded transition duration-300 shadow">Load More</button>
     </main>
 
     <footer class="player fixed bottom-0 left-0 right-0 shadow-lg">
@@ -494,6 +490,8 @@ nav svg {
                 <div class="lofi-toggle w-12 h-6 rounded-full flex items-center p-1 cursor-pointer">
                     <div class="lofi-toggle-knob w-4 h-4 rounded-full"></div>
                 </div>
+                <span class="ml-2 text-sm">Lofi</span>
+            </div>
                 <span class="ml-2 text-sm">Lofi</span>
             </div>
             <div class="player-right">
@@ -527,10 +525,52 @@ const currentTimeElement = document.getElementById('current-time');
 const durationElement = document.getElementById('duration');
 const slowedReverbToggle = document.querySelector('.lofi-toggle');
 
+// Add local songs
+const localSongs = [
+    {
+        id: 'local-1',
+        name: 'Sample Song',
+        album: 'Local Album',
+        image: '1.jpeg',
+        url: '1.mp3'
+    }
+    // Add more local songs here
+];
+
 document.getElementById('search-form').addEventListener('submit', function(event) {
     event.preventDefault();
-    SaavnSearch();
+    const searchQuery = document.getElementById('saavn-search-box').value.toLowerCase();
+    const results = SaavnSearch();
+    
+    // Add local songs to search results
+    const localResults = localSongs.filter(song => 
+        song.name.toLowerCase().includes(searchQuery) || 
+        song.album.toLowerCase().includes(searchQuery)
+    );
+    
+    displayResults(localResults.concat(results));
 });
+
+function displayResults(results) {
+    const resultsContainer = document.getElementById('saavn-results');
+    resultsContainer.innerHTML = '';
+    
+    results.forEach(song => {
+        const songElement = document.createElement('div');
+        songElement.className = 'song-container';
+        songElement.innerHTML = `
+            <div class="song-image">
+                <img src="${song.image}" alt="${song.name}" id="${song.id}-i">
+            </div>
+            <div class="song-info">
+                <h3 class="song-name" id="${song.id}-n">${song.name}</h3>
+                <p class="song-artist" id="${song.id}-a">${song.album}</p>
+            </div>
+        `;
+        songElement.addEventListener('click', () => PlayAudio(song.url, song.id));
+        resultsContainer.appendChild(songElement);
+    });
+}
 
 document.getElementById('play-pause').addEventListener('click', togglePlayPause);
 
