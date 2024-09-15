@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S-Codify</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <style>
+        * {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+    color: #ffffff;
+    padding-bottom: 90px;
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 90px;
+    width: 196px;
+    background: linear-gradient(180deg, #000000, #1a1a1a);
+    padding: 24px;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar .logo h2 {
+    background: linear-gradient(45deg, #1db954, #1ed760);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 24px;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.sidebar .navigation ul {
+    list-style: none;
+    margin-top: 20px;
+}
+
+.sidebar .navigation ul li {
+    padding: 10px 0px;
+}
+
+.sidebar .navigation ul li a {
+    color: #b3b3b3;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 13px;
+    transition: color 0.3s ease;
+}
+
+.sidebar .navigation ul li a:hover,
+.sidebar .navigation ul li a:active,
+.sidebar .navigation ul li a:focus {
+    color: #ffffff;
+}
+
+.sidebar .navigation ul li .fa {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.sidebar .policies {
+    position: absolute;
+    bottom: 100px;
+}
+
+.sidebar .policies ul {
+    list-style: none;
+}
+
+.sidebar .policies ul li {
+    padding-bottom: 5px;
+}
+
+.sidebar .policies ul li a {
+    color: #b3b3b3;
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 10px;
+    transition: color 0.3s ease;
+}
+
+.sidebar .policies ul li a:hover,
+.sidebar .policies ul li a:active,
+.sidebar .policies ul li a:focus {
+    text-decoration: underline;
+    color: #ffffff;
+}
+
+.main-container {
+    margin-left: 245px;
+    margin-bottom: 100px;
+    transition: all 0.3s ease;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    background: rgba(16, 16, 16, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 14px 30px;
+}
+
+.topbar .prev-next-buttons button {
+    color: #7a7a7a;
+    cursor: not-allowed;
+    width: 34px;
+    height: 34px;
+    border-radius: 100%;
+    font-size: 18px;
+    border: 0px;
+    background-color: #090909;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+.topbar .prev-next-buttons button:hover {
+    color: #1db954;
+    transform: scale(1.1);
+}
+
+.topbar .navbar {
+    display: flex;
+    align-items: center;
+}
+
+.topbar .navbar ul {
+    list-style: none;
+}
+
+.topbar .navbar ul li {
+    display: inline-block;
+    margin: 0px 8px;
+    width: 70px;
+}
+
+.topbar .navbar ul li a {
+    color: #b3b3b3;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.topbar .navbar ul li a:hover,
+.topbar .navbar ul li a:active,
+.topbar .navbar ul li a:focus {
+    color: #ffffff;
+    font-size: 15px;
+}
+
+.spotify-playlists {
+    padding: 20px 40px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.spotify-playlists h2 {
+    color: #ffffff;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+.spotify-playlists .list {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 20px;
+}
+
+.spotify-playlists .list .item {
+    min-width: 225px;
+    width: 225px;
+    padding: 15px;
+    background: linear-gradient(135deg, #282828, #1e1e1e);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.spotify-playlists .list .item:hover {
+    background-color: #252525;
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.spotify-playlists .list .item img {
+    width: 100%;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.spotify-playlists .list .item .play {
+    position: relative;
+}
+
+.spotify-playlists .list .item .play .fa {
+    position: absolute;
+    right: 10px;
+    top: -60px;
+    padding: 18px;
+    background: linear-gradient(45deg, #1db954, #1ed760);
+    border-radius: 100%;
+    opacity: 0;
+    transition: all ease 0.4s;
+}
+
+.spotify-playlists .list .item:hover .play .fa {
+    opacity: 1;
+    transform: translateY(-20px);
+}
+
+.spotify-playlists .list .item h4 {
+    color: #ffffff;
+    font-size: 14px;
+    margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spotify-playlists .list .item p {
+    color: #989898;
+    font-size: 12px;
+    line-height: 20px;
+    font-weight: 600;
+}
+
+.player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(24, 24, 24, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 90px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.player .song-info {
+    display: flex;
+    align-items: center;
+}
+
+.player .song-info img {
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
+    border-radius: 4px;
+}
+
+.player .song-info .details {
+    color: #fff;
+}
+
+.player .song-info .details h4 {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.player .song-info .details p {
+    font-size: 12px;
+    color: #b3b3b3;
+}
+
+.player .controls {
+    display: flex;
+    align-items: center;
+}
+
+.player .controls button {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    font-size: 18px;
+    margin: 0 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.player .controls button:hover {
+    color: #1db954;
+    transform: scale(1.1);
+}
+
+.player .controls .play-pause {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    color: #000000;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.player .controls .play-pause:hover {
+    background-color: #1db954;
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.player .progress-bar {
+    flex-grow: 1;
+    margin: 0 20px;
+    cursor: pointer;
+}
+
+.player .progress-bar .bar {
+    width: 100%;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.player .progress-bar .bar .fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #1db954, #1ed760);
+    box-shadow: 0 0 10px rgba(29, 185, 84, 0.5);
+    transition: width 0.1s linear;
+}
+
+.search-bar {
+    display: none;
+    background: rgba(40, 40, 40, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    background-color: transparent;
+    color: #fff;
+    outline: none;
+}
+
+.search-bar input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.search-results {
+    margin-top: 10px;
+    background-color: rgba(249, 247, 247, 0.1);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+#lofi-button {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    font-size: 18px;
+    margin: 0 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#lofi-button:hover {
+    color: #1db954;
+    transform: scale(1.1);
+}
+
+#lofi-button.active {
+    color: #1db954;
+}
+
+/* Stylish scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3e3e3e;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #1db954;
+}
+
+/* Smooth animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Responsive design */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding: 15px;
+        bottom: 0;
+        background: linear-gradient(90deg, #000000, #1a1a1a);
+    }
+
+    .sidebar .navigation ul {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 10px;
+    }
+
+    .sidebar .navigation ul li,
+    .sidebar .policies {
+        display: none;
+    }
+
+    .sidebar .navigation ul li:nth-child(-n+3) {
+        display: block;
+    }
+
+    .main-container {
+        margin-left: 0;
+        margin-bottom: 120px;
+    }
+
+    .topbar {
+        padding: 10px 15px;
+    }
+
+    .topbar .prev-next-buttons,
+    .topbar .navbar ul li:not(:last-child) {
+        display: none;
+    }
+
+    .topbar .navbar ul li:last-child {
+        width: auto;
+    }
+
+    .spotify-playlists {
+        padding: 15px;
+    }
+
+    .spotify-playlists .list {
+        flex-wrap: wrap;
+    }
+
+    .spotify-playlists .list .item {
+        width: calc(50% - 10px);
+        min-width: auto;
+    }
+
+    .player {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+    }
+
+    .player .song-info {
+        margin-bottom: 10px;
+    }
+
+    .player .controls {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    .player .progress-bar {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    #lofi-button {
+        margin-left: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h2>S-Codify</h2>
+        </div>
+
+        <div class="navigation">
+            <ul>
+                <li>
+                    <a href="#">
+                        <span class="fa fa-home"></span>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="search-link">
+                        <span class="fa fa-search"></span>
+                        <span>Search</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="form.html">
+                        <span class="fa fas fa-address-book"></span>
+                        <span>Contact us</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="navigation">
+            <ul>
+                <li>
+                    <a href="https://scodify236.github.io/download/">
+                        <span class="fa fas fa-download"></span>
+                        <span>Download app</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="search-bar" style="display: none;">
+            <input type="text" id="search-input" placeholder="Search for songs...">
+            <div class="search-results"></div>
+        </div>
+
+        <div class="policies">
+            <ul>
+                <li><a href="#">Legal</a></li>
+                <li><a href="#">Privacy Center</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="topbar">
+            <div class="prev-next-buttons">
+                <button type="button" class="fa fa-chevron-left"></button>
+                <button type="button" class="fa fa-chevron-right"></button>
+            </div>
+
+            <div class="navbar">
+                <ul>
+                    <li>
+                        <a href="form.html">Support</a>
+                    </li>
+                    <li>
+                        <a href="https://shashwat-coding.github.io/S-CODERS-Studio/">Download</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="spotify-playlists">
+            <div id="artist-playlists">
+                <!-- Artist playlists will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="player">
+        <div class="song-info">
+            <img src="https://via.placeholder.com/60" alt="Current Song" id="current-song-image">
+            <div class="details">
+                <h4 id="current-song-title">Song Title</h4>
+                <p id="current-song-artist">Artist Name</p>
+            </div>
+        </div>
+        <div class="controls">
+            <button id="prev-button"><i class="fas fa-step-backward"></i></button>
+            <button id="play-pause-button" class="play-pause"><i class="fas fa-play"></i></button>
+            <button id="next-button"><i class="fas fa-step-forward"></i></button>
+            <button id="lofi-button">LoFi</button>
+        </div>
+        <div class="progress-bar">
+            <div class="bar">
+                <div class="fill" id="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const songs = [
+            {
+                title: "Senorita",
+                artist: "Shawn Mendes & Camila Cabello",
+                file: "1.mp3",
+                image: "https://via.placeholder.com/300?text=Senorita"
+            },
+            {
+                title: "Shape of You",
+                artist: "Ed Sheeran",
+                file: "https://example.com/shape_of_you.mp3",
+                image: "https://via.placeholder.com/300?text=Shape+of+You"
+            },
+            {
+                title: "Blinding Lights",
+                artist: "The Weeknd",
+                file: "https://example.com/blinding_lights.mp3",
+                image: "https://via.placeholder.com/300?text=Blinding+Lights"
+            },
+            {
+                title: "Dance Monkey",
+                artist: "Tones and I",
+                file: "https://example.com/dance_monkey.mp3",
+                image: "https://via.placeholder.com/300?text=Dance+Monkey"
+            },
+            {
+                title: "Watermelon Sugar",
+                artist: "Harry Styles",
+                file: "https://example.com/watermelon_sugar.mp3",
+                image: "https://via.placeholder.com/300?text=Watermelon+Sugar"
+            }
+        ];
+
+        let currentSongIndex = 0;
+        let isPlaying = false;
+        let isLofiMode = false;
+        let sound;
+
+        const playPauseButton = document.getElementById('play-pause-button');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const progressBar = document.querySelector('.progress-bar');
+        const progressFill = document.getElementById('progress-fill');
+        const currentSongTitle = document.getElementById('current-song-title');
+        const currentSongArtist = document.getElementById('current-song-artist');
+        const currentSongImage = document.getElementById('current-song-image');
+        const lofiButton = document.getElementById('lofi-button');
+        const searchLink = document.getElementById('search-link');
+        const searchBar = document.querySelector('.search-bar');
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.querySelector('.search-results');
+
+        function loadSong(index) {
+            const song = songs[index];
+            if (sound) {
+                sound.unload();
+            }
+            sound = new Howl({
+                src: [song.file],
+                format: ['mp3'],
+                onplay: function () {
+                    requestAnimationFrame(step);
+                },
+                onend: function () {
+                    nextSong();
+                }
+            });
+            currentSongTitle.textContent = song.title;
+            currentSongArtist.textContent = song.artist;
+            currentSongImage.src = song.image;
+
+            if (isLofiMode) {
+                sound.rate(0.85);
+                sound._sounds[0]._node.effect = createReverb();
+            }
+        }
+
+        function playSong() {
+            isPlaying = true;
+            sound.play();
+            playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
+        }
+
+        function pauseSong() {
+            isPlaying = false;
+            sound.pause();
+            playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
+        }
+
+        function prevSong() {
+            currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+            loadSong(currentSongIndex);
+            if (isPlaying) playSong();
+        }
+
+        function nextSong() {
+            currentSongIndex = (currentSongIndex + 1) % songs.length;
+            loadSong(currentSongIndex);
+            if (isPlaying) playSong();
+        }
+
+        function step() {
+            const seek = sound.seek() || 0;
+            const progress = (seek / sound.duration()) * 100 || 0;
+            progressFill.style.width = `${progress}%`;
+            if (sound.playing()) {
+                requestAnimationFrame(step);
+            }
+        }
+
+        function createPlaylistItem(song, index) {
+            return `
+                <div class="item" data-index="${index}">
+                    <img src="${song.image}" alt="${song.title}" />
+                    <div class="play">
+                        <span class="fa fa-play"></span>
+                    </div>
+                    <h4>${song.title}</h4>
+                    <p>${song.artist}</p>
+                </div>
+            `;
+        }
+
+        function categorizeTracks() {
+            const artistPlaylists = document.getElementById('artist-playlists');
+            const artistMap = {};
+
+            songs.forEach(song => {
+                if (!artistMap[song.artist]) {
+                    artistMap[song.artist] = [];
+                }
+                artistMap[song.artist].push(song);
+            });
+
+            for (const [artist, tracks] of Object.entries(artistMap)) {
+                const artistSection = document.createElement('div');
+                artistSection.innerHTML = `
+                    <h2 style="color: white;">${artist}</h2>
+                    <div class="list">
+                        ${tracks.map((track, index) => createPlaylistItem(track, songs.indexOf(track))).join('')}
+                    </div>
+                `;
+                artistPlaylists.appendChild(artistSection);
+            }
+        }
+
+        function addClickListeners() {
+            document.querySelectorAll('.item').forEach(item => {
+                item.addEventListener('click', () => {
+                    currentSongIndex = parseInt(item.dataset.index);
+                    loadSong(currentSongIndex);
+                    playSong();
+                });
+            });
+        }
+
+        function toggleLofiMode() {
+            isLofiMode = !isLofiMode;
+            lofiButton.classList.toggle('active');
+
+            if (sound) {
+                if (isLofiMode) {
+                    sound.rate(0.85);
+                    sound._sounds[0]._node.effect = createReverb();
+                } else {
+                    sound.rate(1);
+                    sound._sounds[0]._node.effect.disconnect();
+                }
+            }
+        }
+
+        function createReverb() {
+            const context = Howler.ctx;
+            const convolver = context.createConvolver();
+            const dry = context.createGain();
+            const wet = context.createGain();
+
+            const rate = context.sampleRate;
+            const length = rate * 3;
+            const impulse = context.createBuffer(2, length, rate);
+            const impulseL = impulse.getChannelData(0);
+            const impulseR = impulse.getChannelData(1);
+
+            for (let i = 0; i < length; i++) {
+                impulseL[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2);
+                impulseR[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2);
+            }
+
+            convolver.buffer = impulse;
+
+            dry.gain.value = 0.5;
+            wet.gain.value = 0.75;
+
+            const input = context.createGain();
+            input.connect(dry);
+            input.connect(convolver);
+            convolver.connect(wet);
+
+            const output = context.createGain();
+            dry.connect(output);
+            wet.connect(output);
+
+            return {
+                input: input,
+                output: output,
+                disconnect: function () {
+                    input.disconnect();
+                    output.disconnect();
+                }
+            };
+        }
+
+        // Event Listeners
+        playPauseButton.addEventListener('click', () => isPlaying ? pauseSong() : playSong());
+        prevButton.addEventListener('click', prevSong);
+        nextButton.addEventListener('click', nextSong);
+        lofiButton.addEventListener('click', toggleLofiMode);
+
+        progressBar.addEventListener('click', (e) => {
+            const progressWidth = progressBar.clientWidth;
+            const clickX = e.offsetX;
+            const duration = sound.duration();
+
+            const seekTime = (clickX / progressWidth) * duration;
+            sound.seek(seekTime);
+        });
+
+        searchLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            searchBar.style.display = searchBar.style.display === 'none' ? 'block' : 'none';
+        });
+
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredSongs = songs.filter(song =>
+                song.title.toLowerCase().includes(searchTerm) ||
+                song.artist.toLowerCase().includes(searchTerm)
+            );
+
+            searchResults.innerHTML = filteredSongs.map((song, index) => `
+                <div class="item" data-index="${songs.indexOf(song)}">
+                    <h4>${song.title}</h4>
+                    <p>${song.artist}</p>
+                </div>
+            `).join('');
+
+            addClickListeners();
+        });
+
+        // Initialize the player
+        loadSong(currentSongIndex);
+        categorizeTracks();
+        addClickListeners();
+    </script>
+</body>
+
+</html>
