@@ -594,258 +594,216 @@ body {
 
     <script>
         const songs = [
-            {
-                title: "Daku x fuck em all",
-                artist: "Mashup",
-                file: "song/dakuxf.opus",
-                image: "img/dakuxf.jpeg"
-            },
-            {
-                title: "Arjan valley mashup",
-                artist: "Mashup",
-                file: "song/av mashup.opus",
-                image: "https://img.youtube.com/vi/hJR-fwY96fU/sddefault.jpg"
-            },
-            {
-                title: "OG x 0-100",
-                artist: "Mashup",
-                file: "song/0-100.opus",
-                image: "https://img.youtube.com/vi/SFQudt10p7M/sddefault.jpg"
-            },
-            {
-                title: "The Gangster Hood 2",
-                artist: "Mashup",
-                file: "song/hood2.opus",
-                image: "https://img.youtube.com/vi/h27syKUvRhk/maxresdefault.jpg"
-            },
-            {
-                title: "Watermelon Sugar",
-                artist: "Harry Styles",
-                file: "https://example.com/watermelon_sugar.mp3",
-                image: "https://via.placeholder.com/300?text=Watermelon+Sugar"
-            }
-        ];
+    {
+        title: "Daku x fuck em all",
+        artist: "Mashup",
+        file: "song/dakuxf.opus",
+        image: "img/dakuxf.jpeg"
+    },
+    {
+        title: "Arjan valley mashup",
+        artist: "Mashup",
+        file: "song/av mashup.opus",
+        image: "https://img.youtube.com/vi/hJR-fwY96fU/sddefault.jpg"
+    },
+    {
+        title: "OG x 0-100",
+        artist: "Mashup",
+        file: "song/0-100.opus",
+        image: "https://img.youtube.com/vi/SFQudt10p7M/sddefault.jpg"
+    },
+    {
+        title: "The Gangster Hood 2",
+        artist: "Mashup",
+        file: "song/hood2.opus",
+        image: "https://img.youtube.com/vi/h27syKUvRhk/maxresdefault.jpg"
+    },
+    {
+        title: "Watermelon Sugar",
+        artist: "Harry Styles",
+        file: "https://example.com/watermelon_sugar.mp3",
+        image: "https://via.placeholder.com/300?text=Watermelon+Sugar"
+    }
+];
 
-        let currentSongIndex = 0;
-        let isPlaying = false;
-        let isLofiMode = false;
-        let sound;
+let currentSongIndex = 0;
+let isPlaying = false;
+let isLofiMode = false;
+let sound;
 
-        const playPauseButton = document.getElementById('play-pause-button');
-        const prevButton = document.getElementById('prev-button');
-        const nextButton = document.getElementById('next-button');
-        const progressBar = document.querySelector('.progress-bar');
-        const progressFill = document.getElementById('progress-fill');
-        const currentSongTitle = document.getElementById('current-song-title');
-        const currentSongArtist = document.getElementById('current-song-artist');
-        const currentSongImage = document.getElementById('current-song-image');
-        const lofiButton = document.getElementById('lofi-button');
-        const searchLink = document.getElementById('search-link');
-        const searchBar = document.querySelector('.search-bar');
-        const searchInput = document.getElementById('search-input');
-        const searchResults = document.querySelector('.search-results');
+const playPauseButton = document.getElementById('play-pause-button');
+const prevButton = document.getElementById('prev-button');
+const nextButton = document.getElementById('next-button');
+const progressBar = document.querySelector('.progress-bar');
+const progressFill = document.getElementById('progress-fill');
+const currentSongTitle = document.getElementById('current-song-title');
+const currentSongArtist = document.getElementById('current-song-artist');
+const currentSongImage = document.getElementById('current-song-image');
+const lofiButton = document.getElementById('lofi-button');
+const searchLink = document.getElementById('search-link');
+const searchBar = document.querySelector('.search-bar');
+const searchInput = document.getElementById('search-input');
+const searchResults = document.querySelector('.search-results');
 
-        function loadSong(index) {
-            const song = songs[index];
-            if (sound) {
-                sound.unload();
-            }
-            sound = new Howl({
-                src: [song.file],
-                format: ['mp3'],
-                onplay: function () {
-                    requestAnimationFrame(step);
-                },
-                onend: function () {
-                    nextSong();
-                }
-            });
-            currentSongTitle.textContent = song.title;
-            currentSongArtist.textContent = song.artist;
-            currentSongImage.src = song.image;
-
-            if (isLofiMode) {
-                sound.rate(0.85);
-                sound._sounds[0]._node.effect = createReverb();
-            }
+function loadSong(index) {
+    const song = songs[index];
+    if (sound) {
+        sound.unload();
+    }
+    sound = new Howl({
+        src: [song.file],
+        format: ['opus', 'mp3'],
+        html5: true, // Force HTML5 Audio to enable streaming
+        preload: false, // Disable preloading
+        onplay: function () {
+            requestAnimationFrame(step);
+        },
+        onend: function () {
+            nextSong();
         }
+    });
+    currentSongTitle.textContent = song.title;
+    currentSongArtist.textContent = song.artist;
+    currentSongImage.src = song.image;
 
-        function playSong() {
-            isPlaying = true;
-            sound.play();
-            playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
+    if (isLofiMode) {
+        sound.rate(0.85);
+    }
+}
+
+function playSong() {
+    isPlaying = true;
+    sound.play();
+    playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
+}
+
+function pauseSong() {
+    isPlaying = false;
+    sound.pause();
+    playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
+}
+
+function prevSong() {
+    currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+    loadSong(currentSongIndex);
+    if (isPlaying) playSong();
+}
+
+function nextSong() {
+    currentSongIndex = (currentSongIndex + 1) % songs.length;
+    loadSong(currentSongIndex);
+    if (isPlaying) playSong();
+}
+
+function step() {
+    const seek = sound.seek() || 0;
+    const progress = (seek / sound.duration()) * 100 || 0;
+    progressFill.style.width = `${progress}%`;
+    if (sound.playing()) {
+        requestAnimationFrame(step);
+    }
+}
+
+function createPlaylistItem(song, index) {
+    return `
+        <div class="item" data-index="${index}">
+            <img src="${song.image}" alt="${song.title}" />
+            <div class="play">
+                <span class="fa fa-play"></span>
+            </div>
+            <h4>${song.title}</h4>
+            <p>${song.artist}</p>
+        </div>
+    `;
+}
+
+function categorizeTracks() {
+    const artistPlaylists = document.getElementById('artist-playlists');
+    const artistMap = {};
+
+    songs.forEach(song => {
+        if (!artistMap[song.artist]) {
+            artistMap[song.artist] = [];
         }
+        artistMap[song.artist].push(song);
+    });
 
-        function pauseSong() {
-            isPlaying = false;
-            sound.pause();
-            playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
-        }
+    for (const [artist, tracks] of Object.entries(artistMap)) {
+        const artistSection = document.createElement('div');
+        artistSection.innerHTML = `
+            <h2 style="color: white;">${artist}</h2>
+            <div class="list">
+                ${tracks.map((track, index) => createPlaylistItem(track, songs.indexOf(track))).join('')}
+            </div>
+        `;
+        artistPlaylists.appendChild(artistSection);
+    }
+}
 
-        function prevSong() {
-            currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+function addClickListeners() {
+    document.querySelectorAll('.item').forEach(item => {
+        item.addEventListener('click', () => {
+            currentSongIndex = parseInt(item.dataset.index);
             loadSong(currentSongIndex);
-            if (isPlaying) playSong();
-        }
-
-        function nextSong() {
-            currentSongIndex = (currentSongIndex + 1) % songs.length;
-            loadSong(currentSongIndex);
-            if (isPlaying) playSong();
-        }
-
-        function step() {
-            const seek = sound.seek() || 0;
-            const progress = (seek / sound.duration()) * 100 || 0;
-            progressFill.style.width = `${progress}%`;
-            if (sound.playing()) {
-                requestAnimationFrame(step);
-            }
-        }
-
-        function createPlaylistItem(song, index) {
-            return `
-                <div class="item" data-index="${index}">
-                    <img src="${song.image}" alt="${song.title}" />
-                    <div class="play">
-                        <span class="fa fa-play"></span>
-                    </div>
-                    <h4>${song.title}</h4>
-                    <p>${song.artist}</p>
-                </div>
-            `;
-        }
-
-        function categorizeTracks() {
-            const artistPlaylists = document.getElementById('artist-playlists');
-            const artistMap = {};
-
-            songs.forEach(song => {
-                if (!artistMap[song.artist]) {
-                    artistMap[song.artist] = [];
-                }
-                artistMap[song.artist].push(song);
-            });
-
-            for (const [artist, tracks] of Object.entries(artistMap)) {
-                const artistSection = document.createElement('div');
-                artistSection.innerHTML = `
-                    <h2 style="color: white;">${artist}</h2>
-                    <div class="list">
-                        ${tracks.map((track, index) => createPlaylistItem(track, songs.indexOf(track))).join('')}
-                    </div>
-                `;
-                artistPlaylists.appendChild(artistSection);
-            }
-        }
-
-        function addClickListeners() {
-            document.querySelectorAll('.item').forEach(item => {
-                item.addEventListener('click', () => {
-                    currentSongIndex = parseInt(item.dataset.index);
-                    loadSong(currentSongIndex);
-                    playSong();
-                });
-            });
-        }
-
-        function toggleLofiMode() {
-            isLofiMode = !isLofiMode;
-            lofiButton.classList.toggle('active');
-
-            if (sound) {
-                if (isLofiMode) {
-                    sound.rate(0.85);
-                    sound._sounds[0]._node.effect = createReverb();
-                } else {
-                    sound.rate(1);
-                    sound._sounds[0]._node.effect.disconnect();
-                }
-            }
-        }
-
-        function createReverb() {
-            const context = Howler.ctx;
-            const convolver = context.createConvolver();
-            const dry = context.createGain();
-            const wet = context.createGain();
-
-            const rate = context.sampleRate;
-            const length = rate * 3;
-            const impulse = context.createBuffer(2, length, rate);
-            const impulseL = impulse.getChannelData(0);
-            const impulseR = impulse.getChannelData(1);
-
-            for (let i = 0; i < length; i++) {
-                impulseL[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2);
-                impulseR[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2);
-            }
-
-            convolver.buffer = impulse;
-
-            dry.gain.value = 0.5;
-            wet.gain.value = 0.75;
-
-            const input = context.createGain();
-            input.connect(dry);
-            input.connect(convolver);
-            convolver.connect(wet);
-
-            const output = context.createGain();
-            dry.connect(output);
-            wet.connect(output);
-
-            return {
-                input: input,
-                output: output,
-                disconnect: function () {
-                    input.disconnect();
-                    output.disconnect();
-                }
-            };
-        }
-
-        // Event Listeners
-        playPauseButton.addEventListener('click', () => isPlaying ? pauseSong() : playSong());
-        prevButton.addEventListener('click', prevSong);
-        nextButton.addEventListener('click', nextSong);
-        lofiButton.addEventListener('click', toggleLofiMode);
-
-        progressBar.addEventListener('click', (e) => {
-            const progressWidth = progressBar.clientWidth;
-            const clickX = e.offsetX;
-            const duration = sound.duration();
-
-            const seekTime = (clickX / progressWidth) * duration;
-            sound.seek(seekTime);
+            playSong();
         });
+    });
+}
 
-        searchLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            searchBar.style.display = searchBar.style.display === 'none' ? 'block' : 'none';
-        });
+function toggleLofiMode() {
+    isLofiMode = !isLofiMode;
+    lofiButton.classList.toggle('active');
 
-        searchInput.addEventListener('input', () => {
-            const searchTerm = searchInput.value.toLowerCase();
-            const filteredSongs = songs.filter(song =>
-                song.title.toLowerCase().includes(searchTerm) ||
-                song.artist.toLowerCase().includes(searchTerm)
-            );
+    if (sound) {
+        if (isLofiMode) {
+            sound.rate(0.85);
+        } else {
+            sound.rate(1);
+        }
+    }
+}
 
-            searchResults.innerHTML = filteredSongs.map((song, index) => `
-                <div class="item" data-index="${songs.indexOf(song)}">
-                    <h4>${song.title}</h4>
-                    <p>${song.artist}</p>
-                </div>
-            `).join('');
+// Event Listeners
+playPauseButton.addEventListener('click', () => isPlaying ? pauseSong() : playSong());
+prevButton.addEventListener('click', prevSong);
+nextButton.addEventListener('click', nextSong);
+lofiButton.addEventListener('click', toggleLofiMode);
 
-            addClickListeners();
-        });
+progressBar.addEventListener('click', (e) => {
+    const progressWidth = progressBar.clientWidth;
+    const clickX = e.offsetX;
+    const duration = sound.duration();
 
-        // Initialize the player
-        loadSong(currentSongIndex);
-        categorizeTracks();
-        addClickListeners();
+    const seekTime = (clickX / progressWidth) * duration;
+    sound.seek(seekTime);
+});
+
+searchLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    searchBar.style.display = searchBar.style.display === 'none' ? 'block' : 'none';
+});
+
+searchInput.addEventListener('input', () => {
+    const searchTerm = searchInput.value.toLowerCase();
+    const filteredSongs = songs.filter(song =>
+        song.title.toLowerCase().includes(searchTerm) ||
+        song.artist.toLowerCase().includes(searchTerm)
+    );
+
+    searchResults.innerHTML = filteredSongs.map((song, index) => `
+        <div class="item" data-index="${songs.indexOf(song)}">
+            <h4>${song.title}</h4>
+            <p>${song.artist}</p>
+        </div>
+    `).join('');
+
+    addClickListeners();
+});
+
+// Initialize the player
+loadSong(currentSongIndex);
+categorizeTracks();
+addClickListeners();
     </script>
 </body>
 
