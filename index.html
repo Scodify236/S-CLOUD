@@ -62,6 +62,12 @@
             white-space: nowrap;
             padding: 8px 0;
             -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;  /* Firefox */
+            -ms-overflow-style: none;  /* Internet Explorer 10+ */
+        }
+
+        .search-query-container::-webkit-scrollbar {
+            display: none;  /* WebKit */
         }
 
         .search-query-button {
@@ -120,7 +126,7 @@
                 </div>
             </div>
 
-            <div class="search-query-container custom-scrollbar">
+            <div class="search-query-container">
                 <button class="search-query-button ml-4">Hindi</button>
                 <button class="search-query-button">English</button>
                 <button class="search-query-button">Punjabi</button>
