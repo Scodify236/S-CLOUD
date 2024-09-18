@@ -88,8 +88,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web-audio-api/2.0.0/audioworklet.min.js"></script>
-    <script src="assets/js/functions.js"></script>
-    <script src="assets/js/saavn-search.js"></script>
     <script>
     let audioContext;
     let sourceNode;
@@ -98,37 +96,149 @@
 
     document.getElementById('search-form').addEventListener('submit', function(event) {
         event.preventDefault();
-        const results = SaavnSearch();
-        displayResults(results);
+        SaavnSearch();
     });
 
-    function displayResults(results) {
-        const resultsContainer = document.getElementById('saavn-results');
-        resultsContainer.innerHTML = '';
-        
-        results.forEach(song => {
-            const songElement = document.createElement('div');
-            songElement.className = 'bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 flex items-center';
-            songElement.innerHTML = `
-                <img src="${song.image}" alt="${song.name}" class="w-16 h-16 object-cover" id="${song.id}-i">
-                <div class="p-4 flex-grow">
-                    <h3 class="font-semibold text-sm mb-1" id="${song.id}-n">${song.name}</h3>
-                    <p class="text-gray-400 text-xs" id="${song.id}-a">${song.album}</p>
+    var results_container = document.querySelector("#saavn-results");
+    var results_objects = {};
+    const searchUrl = "https://jiosaavn-api-privatecvc2.vercel.app/search/songs?query=";
+    var currentlyPlayingAudio = null;
+
+    function SaavnSearch() {
+        event.preventDefault();
+        var query = document.querySelector("#saavn-search-box").value.trim();
+        query = encodeURIComponent(query);
+
+        if (query.length > 0) {
+            window.location.hash = query;
+            doSaavnSearch(query);
+        }
+    }
+
+    var page_index = 1;
+    function nextPage() {
+        var query = document.querySelector("#saavn-search-box").value.trim();
+        if (!query) {
+            query = lastSearch;
+        }
+        query = encodeURIComponent(query);
+        doSaavnSearch(query, 0, true);
+    }
+
+    async function doSaavnSearch(query, NotScroll, page) {
+        window.location.hash = query;
+        document.querySelector("#saavn-search-box").value = decodeURIComponent(query);
+        if (!query) {
+            return 0;
+        }
+        results_container.innerHTML = `<div class="loader">Searching...</div>`;
+        query = query + "&limit=40";
+        if (page) {
+            page_index = page_index + 1;
+            query = query + "&page=" + page_index;
+        } else {
+            query = query + "&page=1";
+            page_index = 1;
+        }
+
+        try {
+            var response = await fetch(searchUrl + query);
+        } catch (error) {
+            results_container.innerHTML = `<div class="error">Error: ${error} <br> Check if you are connected to the internet </div>`;
+        }
+        var json = await response.json();
+        if (response.status !== 200) {
+            results_container.innerHTML = `<div class="error">Error: ${json.message}</div>`;
+            console.log(response);
+            return 0;
+        }
+        var json = json.data.results;
+        var results = [];
+        if (!json) {
+            results_container.innerHTML = "<p> No results found. Try another search term. </p>";
+            return;
+        }
+        lastSearch = decodeURI(window.location.hash.substring(1));
+        for (let track of json) {
+            song_name = TextAbstract(track.name, 60);
+            album_name = TextAbstract(track.album.name, 40);
+            if (track.album.name == track.name) {
+                album_name = "";
+            }
+            var measuredTime = new Date(null);
+            measuredTime.setSeconds(track.duration);
+            var play_time = measuredTime.toISOString().substr(11, 8);
+            if (play_time.startsWith("00:0")) {
+                play_time = play_time.slice(4);
+            }
+            if (play_time.startsWith("00:")) {
+                play_time = play_time.slice(3);
+            }
+            var song_id = track.id;
+            var year = track.year;
+            var song_image = track.image[2].link; // Using a larger image
+            var song_artist = TextAbstract(track.primaryArtists, 40);
+            var bitrate = document.getElementById('saavn-bitrate');
+            var bitrate_i = bitrate.options[bitrate.selectedIndex].value;
+            if (track.downloadUrl) {
+                var download_url = track.downloadUrl[bitrate_i]['link'];
+                var quality = bitrate_i == 4 ? 320 : 160;
+                results_objects[song_id] = {
+                    track: track
+                };
+                results.push(`
+                <div class="video-container bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 flex flex-col h-full" data-song-id="${song_id}" data-download-url="${download_url}">
+                    <div class="relative pb-[56.25%]">
+                        <img src="${song_image}" alt="Album cover" class="absolute top-0 left-0 w-full h-full object-cover">
+                        <span class="absolute bottom-1 right-1 bg-black bg-opacity-75 text-white text-xs px-1 rounded">${play_time}</span>
+                    </div>
+                    <div class="p-4 flex-grow">
+                        <h3 class="font-semibold text-sm mb-1">${song_name}</h3>
+                        <p class="text-gray-400 text-xs">${song_artist}</p>
+                        <p class="text-gray-500 text-xs mt-1">${album_name} • ${year}</p>
+                    </div>
                 </div>
-            `;
-            songElement.addEventListener('click', () => PlayAudio(song.url, song.id));
-            resultsContainer.appendChild(songElement);
+                `);
+            }
+        }
+
+        results_container.innerHTML = results.join('');
+        if (!NotScroll) {
+            document.getElementById("saavn-results").scrollIntoView();
+        }
+
+        // Add click event listener to video containers
+        document.querySelectorAll('.video-container').forEach(container => {
+            container.addEventListener('click', function(e) {
+                const songId = this.dataset.songId;
+                const downloadUrl = this.dataset.downloadUrl;
+                PlayAudio(downloadUrl, songId);
+            });
         });
+    }
+
+    function TextAbstract(text, length) {
+        if (text == null) {
+            return "";
+        }
+        if (text.length <= length) {
+            return text;
+        }
+        text = text.substring(0, length);
+        last = text.lastIndexOf(" ");
+        text = text.substring(0, last);
+        return text + "...";
     }
 
     function PlayAudio(audio_url, song_id) {
         var source = document.getElementById('audioSource');
         source.src = audio_url;
-        var name = document.getElementById(song_id+"-n").textContent;
-        var album = document.getElementById(song_id+"-a").textContent;
-        var image = document.getElementById(song_id+"-i").getAttribute("src");
+        var track = results_objects[song_id].track;
+        var name = track.name;
+        var album = track.album.name;
+        var image = track.image[2].link;
         
-        document.title = name+" - "+album;
+        document.title = name + " - " + album;
         document.getElementById("player-name").textContent = name;
         document.getElementById("player-album").textContent = album;
         document.getElementById("player-image").src = image;
@@ -147,10 +257,7 @@
         }
     }
 
-    document.getElementById('loadmore').addEventListener('click', function() {
-        const results = SaavnSearch();
-        displayResults(results);
-    });
+    document.getElementById('loadmore').addEventListener('click', nextPage);
 
     const audio = document.getElementById('player');
     const progressBar = document.getElementById('progress-container');
@@ -182,6 +289,11 @@
         playPauseButton.innerHTML = isPlaying
             ? '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd" /></svg>'
             : '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>';
+    }
+
+    function updateProgress() {
+        const progressPercent = (audio.currentTime / audio.duration) * 100;
+        progress.style.width
     }
 
     function updateProgress() {
@@ -262,6 +374,23 @@
             sourceNode.connect(audioContext.destination);
         }
     }
-    </script>
+
+    // Initial search on page load
+    if (window.location.hash) {
+        doSaavnSearch(window.location.hash.substring(1));
+    } else {
+        doSaavnSearch('hindi', 1);
+    }
+
+    // Handle hash change
+    window.addEventListener('hashchange', () => {
+        doSaavnSearch(window.location.hash.substring(1));
+    });
+
+    // Update bitrate when changed
+    document.getElementById('saavn-bitrate').addEventListener('change', function () {
+        doSaavnSearch(lastSearch);
+    });
+</script>
 </body>
 </html>
