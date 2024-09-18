@@ -10,26 +10,49 @@
         body {
             font-family: 'Roboto', sans-serif;
         }
+
         .custom-scrollbar::-webkit-scrollbar {
             width: 8px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-track {
             background: #202020;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background-color: #606060;
             border-radius: 4px;
         }
-        .pt-28{
+
+        .pt-28 {
             margin-top: 4%;
         }
+
+        /* Mobile adjustments */
         @media (max-width: 640px) {
             .mobile-search {
                 order: 1;
                 width: 100%;
                 margin-top: 0.5rem;
             }
+
+            .header-content {
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .mobile-search, #mobile-saavn-bitrate {
+                margin-top: 0.5rem;
+            }
+
+            /* Ensure the lofi button is always visible */
+            .lofi-toggle {
+                display: flex !important;
+                margin-top: 0.5rem;
+            }
         }
+
         .search-query-container {
             display: flex;
             overflow-x: auto;
@@ -37,6 +60,7 @@
             padding: 8px 0;
             -webkit-overflow-scrolling: touch;
         }
+
         .search-query-button {
             display: inline-block;
             padding: 5px 10px;
@@ -48,20 +72,42 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
+
         .search-query-button:hover {
             background-color: #3f3f3f;
         }
-        .pt-28{
+
+        .pt-28 {
             margin-top: 25%;
+        }
+
+        /* Center the footer controls on mobile */
+        @media (max-width: 640px) {
+            .footer-controls {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .footer-controls img {
+                margin-bottom: 0.5rem;
+            }
+
+            .lofi-toggle,
+            .play-pause-container {
+                margin-top: 0.5rem;
+            }
         }
     </style>
 </head>
 <body class="bg-[#0f0f0f] text-white min-h-screen">
     <header class="fixed top-0 left-0 right-0 bg-[#202020] shadow-md z-50">
         <div class="max-w-7xl mx-auto px-4 py-2">
-            <div class="flex flex-wrap items-center justify-between">
+            <div class="flex flex-wrap items-center justify-between header-content">
+                <!-- Branding -->
                 <div class="flex items-center">
                     <h1 class="text-2xl font-bold mr-8">S-CLOUD</h1>
+                    <!-- Bitrate Selector -->
                     <div class="hidden sm:flex items-center">
                         <label for="saavn-bitrate" class="mr-2 text-sm">Quality:</label>
                         <select id="saavn-bitrate" class="p-2 rounded-md text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -70,6 +116,8 @@
                         </select>
                     </div>
                 </div>
+
+                <!-- Search Bar -->
                 <form id="search-form" class="flex w-full sm:w-auto mobile-search">
                     <input type="text" id="saavn-search-box" placeholder="Search for songs..." class="w-full sm:w-96 p-2 rounded-l-full text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <button type="submit" class="bg-[#313131] hover:bg-[#3f3f3f] text-white font-semibold py-2 px-4 rounded-r-full transition duration-300">
@@ -78,7 +126,9 @@
                         </svg>
                     </button>
                 </form>
-                <div class="sm:hidden flex items-center mt-2 w-full justify-end">
+
+                <!-- Mobile Bitrate Selector -->
+                <div class="sm:hidden flex items-center mt-2 w-full justify-center">
                     <label for="mobile-saavn-bitrate" class="mr-2 text-sm">Quality:</label>
                     <select id="mobile-saavn-bitrate" class="p-2 rounded-md text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="4">320 kbps</option>
@@ -87,6 +137,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- Search Query Buttons -->
         <div class="search-query-container custom-scrollbar">
             <button style="margin-left: 10px;" class="search-query-button">Hindi</button>
             <button class="search-query-button">English</button>
@@ -99,27 +151,28 @@
             <button class="search-query-button">Old</button>
             <button class="search-query-button">Yo Yo Honey Singh</button>
             <button class="search-query-button">Shubh</button>
-            <button class="search-query-button">AP Dhillon</button>
             <button class="search-query-button">Deep Jhandu</button>
             <button class="search-query-button">Arjit Singh</button>
             <button class="search-query-button">Ed sheeran</button>
             <button class="search-query-button">Retro</button>
+            <!-- Add more search query buttons as needed -->
         </div>
     </header>
 
+    <!-- Main content -->
     <main class="pt-28 sm:pt-20 pb-24 px-4">
         <div id="saavn-results" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 custom-scrollbar" style="margin-top: 4%;">
             <!-- Search results will be dynamically inserted here -->
         </div>
-
         <button id="loadmore" class="mt-8 bg-[#3ea6ff] hover:bg-[#65b5ff] text-black font-semibold py-2 px-4 rounded-full transition duration-300 mx-auto block">Load More</button>
     </main>
 
+    <!-- Footer (Music Player) -->
     <footer class="fixed bottom-0 left-0 right-0 bg-[#202020] shadow-lg">
         <div id="progress-container" class="h-1 bg-gray-600">
             <div id="progress" class="h-full bg-[#ff0000] w-0"></div>
         </div>
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between footer-controls">
             <div class="flex items-center">
                 <img id="player-image" src="/api/placeholder/48/48" alt="Album cover" class="w-12 h-12 rounded-lg shadow-md mr-4">
                 <div>
@@ -127,18 +180,24 @@
                     <p id="player-album" class="text-xs text-gray-400">Album Name</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-4">
+
+            <!-- Music Controls -->
+            <div class="flex items-center space-x-4 play-pause-container">
                 <button id="play-pause" class="bg-[#3ea6ff] hover:bg-[#65b5ff] text-black rounded-full p-2 transition duration-300">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
                     </svg>
                 </button>
-                <div class="hidden sm:flex items-center">
+
+                <!-- Lofi Toggle -->
+                <div class="flex items-center">
                     <div class="lofi-toggle w-12 h-6 bg-gray-600 rounded-full flex items-center p-1 cursor-pointer">
                         <div class="lofi-toggle-knob w-4 h-4 bg-white rounded-full transition-transform duration-300"></div>
                     </div>
                     <span class="ml-2 text-sm font-medium">Lofi</span>
                 </div>
+
+                <!-- Progress Time -->
                 <div class="text-xs">
                     <span id="current-time">0:00</span>
                     <span>/</span>
@@ -147,7 +206,6 @@
             </div>
         </div>
     </footer>
-
     <audio id="player" crossorigin="anonymous">
         <source id="audioSource" src="" type="audio/mp3">
     </audio>
