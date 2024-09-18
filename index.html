@@ -5,55 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S-CLOUD</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-        }
-        .gradient-background {
-            background: linear-gradient(to bottom right, #1a202c, #2d3748);
+            font-family: 'Roboto', sans-serif;
         }
         .custom-scrollbar::-webkit-scrollbar {
             width: 8px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: #2d3748;
+            background: #202020;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: #4a5568;
+            background-color: #606060;
             border-radius: 4px;
+        }
+        @media (max-width: 640px) {
+            .mobile-search {
+                order: 1;
+                width: 100%;
+                margin-top: 0.5rem;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen pb-24 gradient-background">
-    <div class="container mx-auto px-4 py-8">
-        <header class="mb-8">
-            <h1 class="text-3xl font-bold text-center">S-CLOUD</h1>
-        </header>
-
-        <div class="bg-gray-800 rounded-lg p-6 mb-8">
-            <form id="search-form" class="flex flex-col sm:flex-row gap-4">
-                <input type="text" id="saavn-search-box" placeholder="Search for songs..." class="flex-grow p-3 rounded-lg text-gray-900 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">Search</button>
-            </form>
-            <select id="saavn-bitrate" class="mt-4 p-3 rounded-lg text-gray-900 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="4">320 kbps</option>
-                <option value="3">160 kbps</option>
-            </select>
+<body class="bg-[#0f0f0f] text-white min-h-screen">
+    <header class="fixed top-0 left-0 right-0 bg-[#202020] shadow-md z-50">
+        <div class="max-w-7xl mx-auto px-4 py-2">
+            <div class="flex flex-wrap items-center justify-between">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold mr-4">S-CLOUD</h1>
+                    <div class="hidden sm:flex items-center">
+                        <label for="saavn-bitrate" class="mr-2 text-sm">Quality:</label>
+                        <select id="saavn-bitrate" class="p-2 rounded-md text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="4">320 kbps</option>
+                            <option value="3">160 kbps</option>
+                        </select>
+                    </div>
+                </div>
+                <form id="search-form" class="flex w-full sm:w-auto mobile-search">
+                    <input type="text" id="saavn-search-box" placeholder="Search for songs..." class="w-full sm:w-96 p-2 rounded-l-full text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="submit" class="bg-[#313131] hover:bg-[#3f3f3f] text-white font-semibold py-2 px-4 rounded-r-full transition duration-300">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </form>
+                <div class="sm:hidden flex items-center mt-2 w-full justify-end">
+                    <label for="mobile-saavn-bitrate" class="mr-2 text-sm">Quality:</label>
+                    <select id="mobile-saavn-bitrate" class="p-2 rounded-md text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="4">320 kbps</option>
+                        <option value="3">160 kbps</option>
+                    </select>
+                </div>
+            </div>
         </div>
+    </header>
 
-        <div id="saavn-results" class="grid grid-cols-1 md:grid-cols-3 gap-4 custom-scrollbar" style="max-height: 60vh; overflow-y: auto;">
+    <main class="pt-28 sm:pt-20 pb-24 px-4">
+        <div id="saavn-results" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 custom-scrollbar">
             <!-- Search results will be dynamically inserted here -->
         </div>
 
-        <button id="loadmore" class="mt-8 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 mx-auto block">Load More</button>
-    </div>
+        <button id="loadmore" class="mt-8 bg-[#3ea6ff] hover:bg-[#65b5ff] text-black font-semibold py-2 px-4 rounded-full transition duration-300 mx-auto block">Load More</button>
+    </main>
 
-    <footer class="fixed bottom-0 left-0 right-0 bg-gray-800 shadow-lg">
+    <footer class="fixed bottom-0 left-0 right-0 bg-[#202020] shadow-lg">
         <div id="progress-container" class="h-1 bg-gray-600">
-            <div id="progress" class="h-full bg-blue-500 w-0"></div>
+            <div id="progress" class="h-full bg-[#ff0000] w-0"></div>
         </div>
-        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center">
                 <img id="player-image" src="/api/placeholder/48/48" alt="Album cover" class="w-12 h-12 rounded-lg shadow-md mr-4">
                 <div>
@@ -62,12 +83,12 @@
                 </div>
             </div>
             <div class="flex items-center space-x-4">
-                <button id="play-pause" class="bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 transition duration-300">
+                <button id="play-pause" class="bg-[#3ea6ff] hover:bg-[#65b5ff] text-black rounded-full p-2 transition duration-300">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
                     </svg>
                 </button>
-                <div class="flex items-center">
+                <div class="hidden sm:flex items-center">
                     <div class="lofi-toggle w-12 h-6 bg-gray-600 rounded-full flex items-center p-1 cursor-pointer">
                         <div class="lofi-toggle-knob w-4 h-4 bg-white rounded-full transition-transform duration-300"></div>
                     </div>
@@ -105,7 +126,6 @@
     var currentlyPlayingAudio = null;
 
     function SaavnSearch() {
-        event.preventDefault();
         var query = document.querySelector("#saavn-search-box").value.trim();
         query = encodeURIComponent(query);
 
@@ -131,7 +151,9 @@
         if (!query) {
             return 0;
         }
-        results_container.innerHTML = `<div class="loader">Searching...</div>`;
+        if (!page) {
+            results_container.innerHTML = `<div class="loader col-span-full text-center">Searching...</div>`;
+        }
         query = query + "&limit=40";
         if (page) {
             page_index = page_index + 1;
@@ -139,23 +161,24 @@
         } else {
             query = query + "&page=1";
             page_index = 1;
+            results_container.innerHTML = '';
         }
 
         try {
             var response = await fetch(searchUrl + query);
         } catch (error) {
-            results_container.innerHTML = `<div class="error">Error: ${error} <br> Check if you are connected to the internet </div>`;
+            results_container.innerHTML = `<div class="error col-span-full text-center">Error: ${error} <br> Check if you are connected to the internet </div>`;
         }
         var json = await response.json();
         if (response.status !== 200) {
-            results_container.innerHTML = `<div class="error">Error: ${json.message}</div>`;
+            results_container.innerHTML = `<div class="error col-span-full text-center">Error: ${json.message}</div>`;
             console.log(response);
             return 0;
         }
         var json = json.data.results;
         var results = [];
         if (!json) {
-            results_container.innerHTML = "<p> No results found. Try another search term. </p>";
+            results_container.innerHTML = "<p class='col-span-full text-center'> No results found. Try another search term. </p>";
             return;
         }
         lastSearch = decodeURI(window.location.hash.substring(1));
@@ -176,7 +199,7 @@
             }
             var song_id = track.id;
             var year = track.year;
-            var song_image = track.image[2].link; // Using a larger image
+            var song_image = track.image[2].link;
             var song_artist = TextAbstract(track.primaryArtists, 40);
             var bitrate = document.getElementById('saavn-bitrate');
             var bitrate_i = bitrate.options[bitrate.selectedIndex].value;
@@ -202,12 +225,11 @@
             }
         }
 
-        results_container.innerHTML = results.join('');
+        results_container.innerHTML += results.join('');
         if (!NotScroll) {
-            document.getElementById("saavn-results").scrollIntoView();
+            document.getElementById("saavn-results").scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Add click event listener to video containers
         document.querySelectorAll('.video-container').forEach(container => {
             container.addEventListener('click', function(e) {
                 const songId = this.dataset.songId;
