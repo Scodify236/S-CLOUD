@@ -27,6 +27,27 @@
                 margin-top: 0.5rem;
             }
         }
+        .search-query-container {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 8px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        .search-query-button {
+            display: inline-block;
+            padding: 5px 10px;
+            margin-right: 10px;
+            background-color: #313131;
+            color: white;
+            border-radius: 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .search-query-button:hover {
+            background-color: #3f3f3f;
+        }
     </style>
 </head>
 <body class="bg-[#0f0f0f] text-white min-h-screen">
@@ -34,7 +55,7 @@
         <div class="max-w-7xl mx-auto px-4 py-2">
             <div class="flex flex-wrap items-center justify-between">
                 <div class="flex items-center">
-                    <h1 class="text-2xl font-bold mr-4">S-CLOUD</h1>
+                    <h1 class="text-2xl font-bold mr-8">S-CLOUD</h1>
                     <div class="hidden sm:flex items-center">
                         <label for="saavn-bitrate" class="mr-2 text-sm">Quality:</label>
                         <select id="saavn-bitrate" class="p-2 rounded-md text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -60,10 +81,26 @@
                 </div>
             </div>
         </div>
+        <div class="search-query-container custom-scrollbar">
+            <button style="margin-left: 10px;" class="search-query-button">Hindi</button>
+            <button class="search-query-button">English</button>
+            <button class="search-query-button">Punjabi</button>
+            <button class="search-query-button">Marathi</button>
+            <button class="search-query-button">Rajasthani</button>
+            <button class="search-query-button">Odia</button>
+            <button class="search-query-button">Animal</button>
+            <button class="search-query-button">Stree 2</button>
+            <button class="search-query-button">Old</button>
+            <button class="search-query-button">Yo Yo Honey Singh</button>
+            <button class="search-query-button">Shubh</button>
+            <button class="search-query-button">Arjit Singh</button>
+            <button class="search-query-button">Ed sharen</button>
+            <button class="search-query-button">Retro</button>
+        </div>
     </header>
 
     <main class="pt-28 sm:pt-20 pb-24 px-4">
-        <div id="saavn-results" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 custom-scrollbar">
+        <div id="saavn-results" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 custom-scrollbar" style="margin-top: 4%;">
             <!-- Search results will be dynamically inserted here -->
         </div>
 
@@ -118,6 +155,18 @@
     document.getElementById('search-form').addEventListener('submit', function(event) {
         event.preventDefault();
         SaavnSearch();
+    });
+
+    function handleSearchQueryClick(query) {
+        document.querySelector("#saavn-search-box").value = query;
+        SaavnSearch();
+    }
+
+    // Add event listeners to search query buttons
+    document.querySelectorAll('.search-query-button').forEach(button => {
+        button.addEventListener('click', function() {
+            handleSearchQueryClick(this.textContent);
+        });
     });
 
     var results_container = document.querySelector("#saavn-results");
