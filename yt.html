@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Music Search and Player</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #searchForm {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        #searchInput {
+            flex-grow: 1;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #searchButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .song {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        .song img {
+            width: 100%;
+            height: auto;
+        }
+        #player {
+            margin-top: 20px;
+            text-align: center;
+        }
+        #audioPlayer {
+            width: 100%;
+            max-width: 400px;
+        }
+        #debug {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>YouTube Music Search and Player</h1>
+    <form id="searchForm">
+        <input type="text" id="searchInput" placeholder="Search for a song...">
+        <button type="submit" id="searchButton">Search</button>
+    </form>
+    <div id="results"></div>
+    <div id="player"></div>
+    <div id="debug"></div>
+
+    <script>
+        const apiBaseUrl = 'https://yt-music-api-peta.vercel.app';
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+        const resultsContainer = document.getElementById('results');
+        const playerContainer = document.getElementById('player');
+        const debugContainer = document.getElementById('debug');
+
+        function logDebug(message) {
+            console.log(message);
+            debugContainer.innerHTML += `<p>${message}</p>`;
+        }
+
+        searchForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = searchInput.value.trim();
+            if (query) {
+                try {
+                    logDebug(`Searching for: ${query}`);
+                    const response = await axios.get(`${apiBaseUrl}/search/musics?query=${encodeURIComponent(query)}`);
+                    logDebug(`Search results received: ${response.data.length} items`);
+                    displayResults(response.data);
+                } catch (error) {
+                    console.error('Error searching for music:', error);
+                    logDebug(`Error searching for music: ${error.message}`);
+                    resultsContainer.innerHTML = '<p>Error searching for music. Please try again.</p>';
+                }
+            }
+        });
+
+        function displayResults(songs) {
+            resultsContainer.innerHTML = '';
+            songs.forEach(song => {
+                const songElement = document.createElement('div');
+                songElement.className = 'song';
+                songElement.innerHTML = `
+                    <img src="${song.thumbnailUrl}" alt="${song.title}">
+                    <h3>${song.title}</h3>
+                    <p>${song.artists.map(artist => artist.name).join(', ')}</p>
+                    <button onclick="playSong('${song.youtubeId}')">Play</button>
+                `;
+                resultsContainer.appendChild(songElement);
+            });
+            logDebug('Results displayed');
+        }
+
+        async function playSong(youtubeId) {
+            try {
+                logDebug(`Attempting to play song with YouTube ID: ${youtubeId}`);
+                const response = await axios.get(`${apiBaseUrl}/convert/${youtubeId}`);
+                logDebug('Conversion response received');
+                
+                if (response.data && response.data.audio && response.data.audio.length > 0) {
+                    const audioUrl = response.data.audio[0].url;
+                    logDebug(`Audio URL: ${audioUrl}`);
+                    
+                    playerContainer.innerHTML = `
+                        <h2>Now Playing</h2>
+                        <audio id="audioPlayer" controls autoplay>
+                            <source src="${audioUrl}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    `;
+                    
+                    const audioPlayer = document.getElementById('audioPlayer');
+                    audioPlayer.addEventListener('error', (e) => {
+                        logDebug(`Audio player error: ${e.target.error.message}`);
+                        fallbackToYouTubeEmbed(youtubeId);
+                    });
+                    
+                    logDebug('Audio player created');
+                } else {
+                    throw new Error('No audio URL found in the response');
+                }
+            } catch (error) {
+                console.error('Error playing song:', error);
+                logDebug(`Error playing song: ${error.message}`);
+                fallbackToYouTubeEmbed(youtubeId);
+            }
+        }
+
+        function fallbackToYouTubeEmbed(youtubeId) {
+            logDebug('Falling back to YouTube embed');
+            playerContainer.innerHTML = `
+                <h2>Now Playing (YouTube Embed)</h2>
+                <iframe id="youtubePlayer" src="https://www.youtube.com/embed/${youtubeId}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            `;
+        }
+    </script>
+</body>
+</html>
