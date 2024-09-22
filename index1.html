@@ -666,7 +666,7 @@ function removeSlowedReverbEffect() {
 if (window.location.hash) {
     doSaavnSearch(window.location.hash.substring(1));
 } else {
-    doSaavnSearch('scloud', 1);
+    doSaavnSearch('hindi', 1);
 }
 
 // Handle hash change
@@ -695,7 +695,7 @@ document.getElementById('saavn-bitrate').addEventListener('change', function() {
 
 document.getElementById('mobile-saavn-bitrate').addEventListener('change', function() {
     document.getElementById('saavn-bitrate').value = this.value;
-    doSaavnSearch(hindi);
+    doSaavnSearch(lastsearch);
 });
     </script>
 </body>
