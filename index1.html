@@ -204,7 +204,7 @@ const customTracks = [
         primaryArtists: 'Mashup',
         album: { name: 'S-Clous special' },
         year: '2023',
-        duration: 180,
+        duration: 161,
         image: [
             { link: 'img/dakuxf.jpeg' },
             { link: 'img/dakuxf.jpeg' },
@@ -220,22 +220,42 @@ const customTracks = [
     },
     {
         id: 'custom2',
-        name: 'Daku x fuck em all',
+        name: 'Arjan valley mashup',
         primaryArtists: 'Mashup',
         album: { name: 'S-Clous special' },
         year: '2023',
         duration: 180,
         image: [
-            { link: 'img/' },
-            { link: '/api/placeholder/300/300' },
-            { link: '/api/placeholder/300/300' }
+            { link: 'https://img.youtube.com/vi/hJR-fwY96fU/mqdefault.jpg' },
+            { link: 'https://img.youtube.com/vi/hJR-fwY96fU/mqdefault.jpg' },
+            { link: 'https://img.youtube.com/vi/hJR-fwY96fU/mqdefault.jpg' }
         ],
         downloadUrl: [
-            { link: 'https://yourwebserver.com/custom-song-1.mp3' },
-            { link: 'https://yourwebserver.com/custom-song-1.mp3' },
-            { link: 'https://yourwebserver.com/custom-song-1.mp3' },
-            { link: 'https://yourwebserver.com/custom-song-1.mp3' },
-            { link: 'https://yourwebserver.com/custom-song-1.mp3' }
+            { link: 'song/av mashup.opus' },
+            { link: 'song/av mashup.opus' },
+            { link: 'song/av mashup.opus' },
+            { link: 'song/av mashup.opus' },
+            { link: 'song/av mashup.opus' }
+        ]
+    }
+    {
+        id: 'custom3',
+        name: 'Gangster hood 2 mashup',
+        primaryArtists: 'Mashup',
+        album: { name: 'S-Clous special' },
+        year: '2023',
+        duration: 180,
+        image: [
+            { link: 'https://img.youtube.com/vi/h27syKUvRhk/maxresdefault.jpg' },
+            { link: 'https://img.youtube.com/vi/h27syKUvRhk/maxresdefault.jpg' },
+            { link: 'https://img.youtube.com/vi/h27syKUvRhk/maxresdefault.jpg' }
+        ],
+        downloadUrl: [
+            { link: 'song/hood2.opus' },
+            { link: 'song/hood2.opus' },
+            { link: 'song/hood2.opus' },
+            { link: 'song/hood2.opus' },
+            { link: 'song/hood2.opus' }
         ]
     }
     // Add more custom tracks as needed
@@ -295,7 +315,7 @@ async function doSaavnSearch(query, NotScroll, page) {
     if (query.toLowerCase() === 'scloud') {
         // Display custom tracks
         displayResults(customTracks);
-        lastSearch = 'scloud';
+        lastSearch = 'hindi';
     } else {
         query = query + "&limit=40";
         if (page) {
