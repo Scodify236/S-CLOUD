@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Music Player</title>
+    <title>S-CLOUD</title>
+    <link rel="icon" type="image/webp" href="logo.webp">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <script>
         tailwind.config = {
             theme: {
@@ -14,65 +15,90 @@
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     animation: { 'fade-in': 'fadeIn 0.5s ease-out' },
                     keyframes: { fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } } }
-                }
-            }
+                },
+            },
         }
     </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #050505; color: white; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #050505;
+            color: white;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hide Scrollbar but keep functionality */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .glass-nav {
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        .glass-panel {
-            background: rgba(20, 20, 20, 0.6);
-            backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
 
+        /* Dynamic Background */
         .ambient-bg {
-            position: fixed; inset: 0; z-index: -1;
-            background: radial-gradient(circle at 50% 0%, #1e1e2e, #050505 70%);
-            transition: background 1.5s ease;
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 50% -20%, #1e1e2e, #000000);
+            z-index: -2;
+            transition: background 1s ease;
         }
 
-        /* Horizontal Scroll Snap */
-        .scrolling-wrapper {
-            display: flex;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 1rem;
+        /* Glass Components */
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.65);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .card-snap { flex: 0 0 auto; }
         
-        /* Custom Range Slider */
-        input[type=range] { -webkit-appearance: none; background: transparent; }
+        .glass-search {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Expanded Player Slide Animation */
+        #expanded-player {
+            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
         input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; height: 12px; width: 12px;
-            border-radius: 50%; background: #fff; margin-top: -5px;
+            -webkit-appearance: none;
+            height: 12px; width: 12px;
+            border-radius: 50%;
+            background: #fff;
+            margin-top: -5px;
             box-shadow: 0 0 10px rgba(255,255,255,0.5);
         }
         input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 2px; background: rgba(255,255,255,0.2); border-radius: 2px;
+            width: 100%; height: 2px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
         }
+
+        /* Loading Spinner */
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-left-color: #3b82f6;
+            border-radius: 50%;
+            width: 24px; height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden">
+<body class="h-screen overflow-hidden flex flex-col">
 
     <div class="ambient-bg" id="dynamic-bg"></div>
 
-    <header class="glass-nav fixed top-0 left-0 right-0 z-30 pt-4 pb-3 px-4">
-        <div class="max-w-4xl mx-auto w-full">
-            <form id="search-form" class="relative group z-50">
-                <input type="text" id="search-input" placeholder="Search songs, albums, artists..." 
-                    class="w-full bg-white/10 text-white rounded-full py-3 pl-12 pr-4 focus:outline-none focus:bg-white/15 focus:ring-1 focus:ring-white/20 transition-all placeholder-gray-400 text-sm font-medium backdrop-blur-md">
+    <header class="fixed top-0 left-0 right-0 z-30 pt-4 px-4 pb-2 bg-gradient-to-b from-black/80 to-transparent">
+        <div class="max-w-3xl mx-auto w-full">
+            <form id="search-form" class="relative group">
+                <input type="text" id="saavn-search-box" placeholder="Search for songs, artists..." 
+                    class="glass-search w-full text-white rounded-full py-3.5 pl-12 pr-4 focus:outline-none focus:bg-white/10 focus:border-white/20 transition-all placeholder-gray-400 text-sm font-medium shadow-lg">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -80,467 +106,401 @@
                 </div>
             </form>
             
-            <div class="flex gap-2 overflow-x-auto hide-scrollbar mt-3 pb-1">
-                <button class="tag-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/15 transition-all text-gray-300">Trending</button>
-                <button class="tag-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/15 transition-all text-gray-300">New Releases</button>
-                <button class="tag-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/15 transition-all text-gray-300">Lo-Fi</button>
+            <div class="flex gap-2 overflow-x-auto hide-scrollbar mt-3 pb-2 mask-linear">
                 <button class="tag-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/15 transition-all text-gray-300">Hindi</button>
+                <button class="tag-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/15 transition-all text-gray-300">English</button>
                 <button class="tag-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/15 transition-all text-gray-300">Punjabi</button>
+                <button class="tag-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/15 transition-all text-gray-300">Trending</button>
+                <button class="tag-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/15 transition-all text-gray-300">Lo-Fi</button>
+                <button class="tag-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/15 transition-all text-gray-300">90s</button>
             </div>
         </div>
     </header>
 
-    <main id="main-scroll" class="flex-1 overflow-y-auto hide-scrollbar pt-36 pb-32 px-4 scroll-smooth">
+    <main class="flex-1 overflow-y-auto hide-scrollbar pt-32 pb-32 px-4" id="main-scroll">
         <div class="max-w-7xl mx-auto">
-            
-            <div id="home-view" class="space-y-8 animate-fade-in">
-                <section>
-                    <h2 class="text-lg font-bold text-white mb-4 px-1">Trending Songs</h2>
-                    <div id="home-trending" class="scrolling-wrapper gap-4">
-                        <div class="w-full flex justify-center py-4 text-white/20">Loading...</div>
-                    </div>
-                </section>
-
-                <section>
-                    <h2 class="text-lg font-bold text-white mb-4 px-1">Top Albums</h2>
-                    <div id="home-albums" class="scrolling-wrapper gap-4">
-                         <div class="w-full flex justify-center py-4 text-white/20">Loading...</div>
-                    </div>
-                </section>
-
-                <section>
-                    <h2 class="text-lg font-bold text-white mb-4 px-1">Featured Playlists</h2>
-                    <div id="home-playlists" class="scrolling-wrapper gap-4">
-                         <div class="w-full flex justify-center py-4 text-white/20">Loading...</div>
-                    </div>
-                </section>
-            </div>
-
-            <div id="search-view" class="hidden">
-                <h2 id="search-title" class="text-xl font-bold text-white mb-4">Search Results</h2>
-                <div id="search-results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    </div>
-                <div id="load-more-btn" class="hidden justify-center mt-8 pb-8">
-                    <button class="px-6 py-2.5 rounded-full bg-white/10 hover:bg-white/20 transition text-sm font-medium">Load More</button>
+            <div id="saavn-results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6">
                 </div>
+            <div id="load-more-container" class="hidden justify-center mt-10 mb-10">
+                <button id="loadmore" class="px-6 py-2 rounded-full border border-white/10 text-sm hover:bg-white/10 transition-colors">Load More</button>
             </div>
-
         </div>
     </main>
 
-    <div id="mini-player" class="fixed bottom-4 left-3 right-3 z-40 transform translate-y-[150%] transition-transform duration-500 will-change-transform">
-        <div class="glass-panel rounded-2xl p-2.5 flex items-center shadow-2xl cursor-pointer" onclick="openExpandedPlayer()">
-            <img id="mini-img" src="" class="w-12 h-12 rounded-xl object-cover bg-gray-800 shadow-lg">
-            <div class="ml-3 flex-1 min-w-0 flex flex-col justify-center">
-                <p id="mini-name" class="font-semibold text-white text-sm truncate">Song Name</p>
-                <p id="mini-artist" class="text-xs text-gray-400 truncate">Artist</p>
-            </div>
-            <button id="mini-play-btn" class="w-10 h-10 flex-shrink-0 flex items-center justify-center bg-white text-black rounded-full hover:scale-105 transition shadow-lg ml-2" onclick="event.stopPropagation(); togglePlay()">
-                <svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>
-            </button>
+    <div id="mini-player" class="fixed bottom-4 left-4 right-4 z-40 transform translate-y-[150%] transition-transform duration-500">
+        <div class="glass-panel max-w-2xl mx-auto rounded-2xl p-2 shadow-2xl flex items-center justify-between cursor-pointer" onclick="openExpandedPlayer()">
             
-            <div class="absolute bottom-0 left-3 right-3 h-[2px] bg-white/10 rounded-full overflow-hidden">
-                <div id="mini-progress" class="h-full bg-white w-0"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="expanded-player" class="fixed inset-0 z-50 bg-black/95 transform translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col">
-        <div class="flex items-center justify-between p-6 pt-12"> <button onclick="closeExpandedPlayer()" class="p-2 text-white/50 hover:text-white">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </button>
-            <span class="text-xs font-bold tracking-widest text-white/40 uppercase">Now Playing</span>
-            <div class="w-12"></div> </div>
-
-        <div class="flex-1 flex items-center justify-center px-8 relative">
-            <div class="w-full max-w-sm aspect-square relative shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)]">
-                <img id="expanded-img" src="" class="w-full h-full object-cover rounded-[2rem]" crossorigin="anonymous">
-            </div>
-        </div>
-
-        <div class="px-8 pb-12 w-full max-w-md mx-auto">
-            <div class="mb-8">
-                <h2 id="expanded-name" class="text-2xl font-bold text-white mb-2 leading-tight">Song Name</h2>
-                <p id="expanded-artist" class="text-lg text-white/60">Artist Name</p>
-            </div>
-
-            <div class="mb-8">
-                <input type="range" id="seek-slider" min="0" max="100" value="0" class="w-full h-1 bg-white/10 rounded-lg cursor-pointer">
-                <div class="flex justify-between text-xs text-white/40 font-medium mt-3">
-                    <span id="current-time">0:00</span>
-                    <span id="total-time">0:00</span>
+            <div class="flex items-center flex-1 min-w-0">
+                <img id="mini-img" src="" class="w-10 h-10 rounded-lg object-cover bg-gray-800 shadow-md">
+                <div class="ml-3 flex-col flex overflow-hidden">
+                    <p id="mini-name" class="font-medium text-white text-sm truncate">Song Name</p>
+                    <p id="mini-artist" class="text-xs text-gray-400 truncate">Artist</p>
                 </div>
             </div>
 
-            <div class="flex items-center justify-between mb-8">
-                <button class="text-white/40 hover:text-white p-2" onclick="playPrevious()">
-                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+            <div class="flex items-center gap-3 pr-2" onclick="event.stopPropagation()">
+                <button id="mini-play-pause" class="w-8 h-8 flex items-center justify-center bg-white text-black rounded-full hover:scale-105 transition-transform">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>
                 </button>
-                
-                <button id="expanded-play-btn" class="w-20 h-20 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-[0_0_40px_rgba(255,255,255,0.15)]" onclick="togglePlay()">
-                    <svg class="w-8 h-8 ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>
-                </button>
-                
-                <button class="text-white/40 hover:text-white p-2" onclick="playNext()">
-                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-                </button>
+            </div>
+            
+            <div class="absolute bottom-0 left-2 right-2 h-[2px] bg-white/10 rounded-full overflow-hidden">
+                <div id="mini-progress" class="h-full bg-white/80 w-0 transition-all duration-100"></div>
             </div>
         </div>
     </div>
 
-    <audio id="audio-player" crossorigin="anonymous"></audio>
+    <div id="expanded-player" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-3xl transform translate-y-full flex flex-col">
+        <div class="flex items-center justify-between p-6 mt-2">
+            <button onclick="closeExpandedPlayer()" class="text-white/70 hover:text-white p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <span class="text-xs font-bold tracking-widest text-white/50 uppercase">Now Playing</span>
+            <button class="text-white/70 hover:text-white p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+            </button>
+        </div>
+
+        <div class="flex-1 flex flex-col items-center justify-center px-8 pb-10">
+            <div class="w-full max-w-sm aspect-square relative mb-8 group">
+                <img id="expanded-img" src="" class="w-full h-full object-cover rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform transition-transform duration-500 scale-100" crossorigin="anonymous">
+            </div>
+
+            <div class="w-full max-w-sm mb-6 text-left">
+                <h2 id="expanded-name" class="text-2xl font-bold text-white mb-1 line-clamp-1">Song Name</h2>
+                <p id="expanded-artist" class="text-lg text-white/60 line-clamp-1">Artist Name</p>
+            </div>
+
+            <div class="w-full max-w-sm mb-6 group">
+                <input type="range" id="seek-slider" min="0" max="100" value="0" class="w-full h-1 bg-white/20 rounded-lg cursor-pointer appearance-none">
+                <div class="flex justify-between text-xs text-white/40 font-mono mt-2">
+                    <span id="expanded-current-time">0:00</span>
+                    <span id="expanded-duration">0:00</span>
+                </div>
+            </div>
+
+            <div class="w-full max-w-sm flex items-center justify-between mb-8">
+                <button class="text-white/40 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg></button>
+                
+                <button id="prev-btn" class="text-white hover:text-white/80 transition"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+                
+                <button id="expanded-play-pause" class="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 transition shadow-lg shadow-white/10">
+                    <svg class="w-8 h-8 ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>
+                </button>
+                
+                <button id="next-btn" class="text-white hover:text-white/80 transition"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+                
+                <button class="text-white/40 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg></button>
+            </div>
+
+            <div class="flex items-center gap-3 cursor-pointer p-2 rounded-xl bg-white/5 hover:bg-white/10 transition" onclick="toggleSlowedReverb()">
+                <div class="lofi-toggle w-8 h-4 bg-white/20 rounded-full relative transition-colors">
+                    <div class="lofi-knob w-4 h-4 bg-white rounded-full shadow-sm absolute top-0 left-0 transition-transform"></div>
+                </div>
+                <span class="text-xs font-semibold text-white/60 uppercase tracking-wide">Slowed & Reverb</span>
+            </div>
+        </div>
+    </div>
+
+    <audio id="player" crossorigin="anonymous"></audio>
 
     <script>
-        // --- Configuration & State ---
-        const BASE_API = "https://saavn-ytify.vercel.app/api"; // Endpoint from your JSON
+        // --- Variables ---
+        const audio = document.getElementById('player');
+        const searchInput = document.getElementById('saavn-search-box');
+        const resultsContainer = document.getElementById('saavn-results');
         const colorThief = new ColorThief();
         
-        let state = {
-            queue: [],
-            currentIndex: 0,
-            searchQuery: "",
-            searchPage: 0,
-            isLoading: false,
-            isPlaying: false
-        };
+        // State
+        let currentQueue = [];
+        let currentSongIndex = -1;
+        let lastSearch = 'trending';
+        let pageIndex = 1;
+        let isLofi = false;
+        let audioContext, sourceNode, reverbNode;
 
-        const DOM = {
-            homeView: document.getElementById('home-view'),
-            searchView: document.getElementById('search-view'),
-            searchResults: document.getElementById('search-results'),
-            searchInput: document.getElementById('search-input'),
-            audio: document.getElementById('audio-player'),
-            miniPlayer: document.getElementById('mini-player'),
-            expandedPlayer: document.getElementById('expanded-player'),
-            dynamicBg: document.getElementById('dynamic-bg')
-        };
+        // --- Logic ---
 
-        // --- Initialization ---
+        // Initialize
         window.addEventListener('load', () => {
-            initHome();
+            if (window.location.hash) doSearch(window.location.hash.substring(1));
+            else doSearch('trending');
         });
 
-        // --- API Interaction (Based on api-1.json) ---
-        
-        async function fetchSongs(query, page = 0, limit = 20) {
-            // According to /api/search/songs in docs
-            const res = await fetch(`${BASE_API}/search/songs?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`);
-            const json = await res.json();
-            return json.success ? json.data.results : [];
-        }
-
-        async function fetchAlbums(query, page = 0, limit = 10) {
-            // According to /api/search/albums in docs
-            const res = await fetch(`${BASE_API}/search/albums?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`);
-            const json = await res.json();
-            return json.success ? json.data.results : [];
-        }
-
-        async function fetchPlaylists(query, page = 0, limit = 10) {
-            // According to /api/search/playlists in docs
-            const res = await fetch(`${BASE_API}/search/playlists?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`);
-            const json = await res.json();
-            return json.success ? json.data.results : [];
-        }
-
-        async function fetchAlbumSongs(albumId) {
-            // According to /api/albums?id=
-            const res = await fetch(`${BASE_API}/albums?id=${albumId}`);
-            const json = await res.json();
-            return json.success ? json.data.songs : [];
-        }
-
-        async function fetchPlaylistSongs(listId) {
-             // According to /api/playlists?id=
-             const res = await fetch(`${BASE_API}/playlists?id=${listId}`);
-             const json = await res.json();
-             return json.success ? json.data.songs : [];
-        }
-
-        // --- Home Page Logic ---
-        async function initHome() {
-            // Simulate a "Homepage" by querying popular terms
-            // 1. Trending Songs
-            const trending = await fetchSongs("Trending", 0, 10);
-            renderHorizontalList('home-trending', trending, 'song');
-
-            // 2. Top Albums
-            const albums = await fetchAlbums("Top", 0, 10);
-            renderHorizontalList('home-albums', albums, 'album');
-
-            // 3. Featured Playlists
-            const playlists = await fetchPlaylists("Hits", 0, 10);
-            renderHorizontalList('home-playlists', playlists, 'playlist');
-        }
-
-        function renderHorizontalList(containerId, items, type) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            
-            items.forEach((item, index) => {
-                const img = item.image[2]?.url || item.image[0]?.url;
-                const title = item.name || item.title;
-                const subtitle = type === 'song' ? item.primaryArtists : (item.description || item.language);
-                
-                const card = document.createElement('div');
-                card.className = 'card-snap w-36 sm:w-44 flex-shrink-0 cursor-pointer group';
-                
-                card.innerHTML = `
-                    <div class="aspect-square rounded-2xl overflow-hidden bg-white/5 relative mb-3">
-                        <img src="${img}" loading="lazy" class="w-full h-full object-cover transition duration-500 group-hover:scale-110 opacity-90 group-hover:opacity-100">
-                    </div>
-                    <h3 class="text-sm font-semibold text-white truncate pr-2">${title}</h3>
-                    <p class="text-xs text-gray-400 truncate">${subtitle || ''}</p>
-                `;
-
-                card.onclick = () => handleItemClick(type, item, index, items);
-                container.appendChild(card);
-            });
-        }
-
-        async function handleItemClick(type, item, index, contextList) {
-            if (type === 'song') {
-                state.queue = contextList; // Set queue to the list we clicked from
-                playSong(index);
-            } else if (type === 'album') {
-                const songs = await fetchAlbumSongs(item.id);
-                if(songs && songs.length) {
-                    state.queue = songs;
-                    playSong(0);
-                }
-            } else if (type === 'playlist') {
-                const songs = await fetchPlaylistSongs(item.id);
-                if(songs && songs.length) {
-                    state.queue = songs;
-                    playSong(0);
-                }
-            }
-        }
-
-        // --- Search Logic ---
+        // Search Handlers
         document.getElementById('search-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            const query = DOM.searchInput.value.trim();
-            if(!query) return;
-
-            // Switch to search view
-            DOM.homeView.classList.add('hidden');
-            DOM.searchView.classList.remove('hidden');
-            DOM.searchResults.innerHTML = '<div class="col-span-full text-center py-10 text-white/50">Searching...</div>';
-            document.getElementById('load-more-btn').classList.add('hidden');
-            
-            state.searchQuery = query;
-            state.searchPage = 0;
-            performSearch(true);
+            const q = searchInput.value.trim();
+            if(q) doSearch(q);
         });
 
-        // Tag buttons logic
         document.querySelectorAll('.tag-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                DOM.searchInput.value = btn.innerText;
-                document.getElementById('search-form').dispatchEvent(new Event('submit'));
+                searchInput.value = btn.innerText;
+                doSearch(btn.innerText);
             });
         });
 
-        async function performSearch(reset = false) {
-            if (state.isLoading) return;
-            state.isLoading = true;
+        document.getElementById('loadmore').addEventListener('click', () => {
+            doSearch(lastSearch, true);
+        });
 
-            const songs = await fetchSongs(state.searchQuery, state.searchPage, 20);
-            state.isLoading = false;
-
-            if (reset) {
-                DOM.searchResults.innerHTML = '';
-                state.queue = []; // Reset queue on new search? Or append? Let's reset for specific search results.
+        // Search Function
+        async function doSearch(query, isNextPage = false) {
+            if(!isNextPage) {
+                window.location.hash = query;
+                lastSearch = query;
+                pageIndex = 1;
+                resultsContainer.innerHTML = '<div class="col-span-full flex justify-center py-20"><div class="loader"></div></div>';
+                document.getElementById('load-more-container').classList.add('hidden');
+            } else {
+                pageIndex++;
             }
 
-            if (songs.length === 0 && reset) {
-                DOM.searchResults.innerHTML = '<div class="col-span-full text-center py-10 text-white/50">No results found.</div>';
-                return;
-            }
-
-            // Append to queue for playback context
-            const startIndex = state.queue.length;
-            state.queue = [...state.queue, ...songs];
-
-            songs.forEach((song, i) => {
-                const globalIndex = reset ? i : startIndex + i;
-                const img = song.image[2]?.url;
+            try {
+                // Fetching forced 320kbps via API logic usually handled by setting bitrate=4 in requests or filtering download links
+                const res = await fetch(`https://jiosaavn-api-privatecvc2.vercel.app/search/songs?query=${encodeURIComponent(query)}&page=${pageIndex}&limit=30`);
+                const data = await res.json();
                 
-                const card = document.createElement('div');
-                card.className = 'cursor-pointer group animate-fade-in';
-                card.innerHTML = `
+                if(!isNextPage) resultsContainer.innerHTML = '';
+                
+                if(data.data.results.length > 0) {
+                    currentQueue = isNextPage ? [...currentQueue, ...data.data.results] : data.data.results;
+                    renderResults(data.data.results, isNextPage);
+                    document.getElementById('load-more-container').classList.remove('hidden');
+                } else {
+                    if(!isNextPage) resultsContainer.innerHTML = '<div class="col-span-full text-center text-white/50 py-10">No results found.</div>';
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderResults(songs, append) {
+            let html = '';
+            // Calculate starting index for the new batch
+            let startIndex = append ? currentQueue.length - songs.length : 0;
+
+            songs.forEach((song, idx) => {
+                // Get 320kbps link if available, else highest
+                let downloadUrl = song.downloadUrl.find(u => u.quality === "320kbps")?.link || song.downloadUrl[song.downloadUrl.length-1].link;
+                let img = song.image[2].link; // 500x500
+                
+                html += `
+                <div class="group relative cursor-pointer animate-fade-in" onclick="playFromQueue(${startIndex + idx})">
                     <div class="aspect-square rounded-2xl overflow-hidden bg-white/5 relative mb-3">
-                        <img src="${img}" loading="lazy" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[1px]">
-                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg transform scale-0 group-hover:scale-100 transition-transform">
-                                <svg class="w-4 h-4 text-black ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>
+                        <img src="${img}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110 group-hover:opacity-60" loading="lazy">
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                            <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>
                             </div>
                         </div>
                     </div>
-                    <h3 class="font-medium text-white text-sm truncate">${song.name}</h3>
+                    <h3 class="font-medium text-white text-sm truncate pr-2">${song.name}</h3>
                     <p class="text-xs text-gray-400 truncate">${song.primaryArtists}</p>
-                `;
-                card.onclick = () => playSong(globalIndex);
-                DOM.searchResults.appendChild(card);
+                </div>`;
             });
-
-            if (songs.length > 0) {
-                document.getElementById('load-more-btn').classList.remove('hidden');
-            } else {
-                 document.getElementById('load-more-btn').classList.add('hidden');
-            }
+            
+            resultsContainer.innerHTML += html;
         }
-
-        document.querySelector('#load-more-btn button').addEventListener('click', () => {
-            state.searchPage++;
-            performSearch(false);
-        });
 
         // --- Player Logic ---
-        function playSong(index) {
-            state.currentIndex = index;
-            const song = state.queue[index];
-            if (!song) return;
 
-            // Find best quality url (320kbps preference)
-            // api-1.json: downloadUrl is array of { quality, url }
-            let audioUrl = "";
-            const qualities = song.downloadUrl;
-            if (Array.isArray(qualities)) {
-                // Try to find 320kbps
-                const best = qualities.find(q => q.quality.includes("320")) || qualities[qualities.length - 1];
-                audioUrl = best.url;
-            } else {
-                audioUrl = song.url; // Fallback if structure differs slightly
-            }
+        function playFromQueue(index) {
+            currentSongIndex = index;
+            loadTrack(currentQueue[index]);
+        }
 
-            DOM.audio.src = audioUrl;
-            DOM.audio.play();
-            state.isPlaying = true;
+        function loadTrack(track) {
+            // Get URL (Prefer 320kbps)
+            let url = track.downloadUrl.find(u => u.quality === "320kbps")?.link || track.downloadUrl[track.downloadUrl.length-1].link;
+            let img = track.image[2].link;
 
-            updatePlayerUI(song);
-            extractColors(song.image[2]?.url);
+            audio.src = url;
+            audio.play();
+
+            // Update UI
+            document.getElementById('mini-player').classList.remove('translate-y-[150%]');
             
-            DOM.miniPlayer.classList.remove('translate-y-[150%]');
-        }
-
-        function togglePlay() {
-            if (DOM.audio.paused) {
-                DOM.audio.play();
-                state.isPlaying = true;
-            } else {
-                DOM.audio.pause();
-                state.isPlaying = false;
-            }
-            updatePlayIcons();
-        }
-
-        function playNext() {
-            if (state.currentIndex < state.queue.length - 1) {
-                playSong(state.currentIndex + 1);
-            }
-        }
-
-        function playPrevious() {
-            if (state.currentIndex > 0) {
-                playSong(state.currentIndex - 1);
-            }
-        }
-
-        // --- UI Updates ---
-        function updatePlayerUI(song) {
-            const img = song.image[2]?.url;
-            const name = song.name;
-            const artist = song.primaryArtists;
-
-            // Mini Player
+            // Mini Player Data
             document.getElementById('mini-img').src = img;
-            document.getElementById('mini-name').innerText = name;
-            document.getElementById('mini-artist').innerText = artist;
+            document.getElementById('mini-name').innerText = track.name;
+            document.getElementById('mini-artist').innerText = track.primaryArtists;
 
-            // Expanded Player
+            // Expanded Player Data
             document.getElementById('expanded-img').src = img;
-            document.getElementById('expanded-name').innerText = name;
-            document.getElementById('expanded-artist').innerText = artist;
+            document.getElementById('expanded-name').innerText = track.name;
+            document.getElementById('expanded-artist').innerText = track.primaryArtists;
 
-            updatePlayIcons();
+            // Extract Colors
+            extractColor(img);
+
+            updatePlayBtn(true);
+            
+            // Re-apply lofi if active
+            if(isLofi) applyLofi();
         }
 
-        function updatePlayIcons() {
-            const playPath = "M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z";
-            const pausePath = "M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z"; // Simple pause circle
-
-            const miniBtn = document.getElementById('mini-play-btn').querySelector('svg path');
-            const expBtn = document.getElementById('expanded-play-btn').querySelector('svg path');
-
-            // Note: Simplification for icons, using standard SVG paths would be cleaner but swapping d attribute works
-            if (state.isPlaying) {
-                // Set to Pause Icon
-                miniBtn.setAttribute('d', "M5 4h3v12H5V4zm7 0h3v12h-3V4z"); // Simple bars
-                expBtn.setAttribute('d', "M5 4h3v12H5V4zm7 0h3v12h-3V4z");
-            } else {
-                // Set to Play Icon
-                miniBtn.setAttribute('d', playPath);
-                expBtn.setAttribute('d', playPath);
-            }
-        }
-
-        function extractColors(url) {
+        function extractColor(imgUrl) {
             const img = new Image();
             img.crossOrigin = "Anonymous";
-            img.src = url;
-            img.onload = () => {
+            img.src = imgUrl;
+            img.onload = function() {
                 try {
                     const color = colorThief.getColor(img);
-                    const rgb = `rgb(${color.join(',')})`;
-                    
-                    // Apply to Expanded Player BG
-                    DOM.expandedPlayer.style.background = `linear-gradient(to bottom, ${rgb} 0%, #000 80%)`;
-                    // Apply to Body BG (Ambient)
-                    DOM.dynamicBg.style.background = `radial-gradient(circle at 50% 0%, ${rgb}, #050505 70%)`;
-                } catch(e) { console.log("CORS blocked color extraction"); }
+                    const rgb = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+                    // Apply to expanded player gradient
+                    document.getElementById('expanded-player').style.background = `linear-gradient(to bottom, ${rgb}, #000)`;
+                    // Apply subtle glow to body
+                    document.getElementById('dynamic-bg').style.background = `radial-gradient(circle at 50% -20%, ${rgb}, #050505)`;
+                } catch (e) {
+                    console.log("CORS blocked color extraction, using default.");
+                    document.getElementById('expanded-player').style.background = "#050505";
+                }
             }
         }
 
-        // --- Progress & Events ---
-        DOM.audio.addEventListener('timeupdate', () => {
-            const curr = DOM.audio.currentTime;
-            const dur = DOM.audio.duration || 1;
-            const percent = (curr / dur) * 100;
-
-            document.getElementById('mini-progress').style.width = `${percent}%`;
-            document.getElementById('seek-slider').value = percent;
-            
-            document.getElementById('current-time').innerText = formatTime(curr);
-            document.getElementById('total-time').innerText = formatTime(dur);
+        // Controls
+        document.getElementById('mini-play-pause').addEventListener('click', togglePlay);
+        document.getElementById('expanded-play-pause').addEventListener('click', togglePlay);
+        
+        document.getElementById('next-btn').addEventListener('click', () => {
+            if(currentSongIndex < currentQueue.length - 1) playFromQueue(currentSongIndex + 1);
+        });
+        
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            if(currentSongIndex > 0) playFromQueue(currentSongIndex - 1);
         });
 
-        DOM.audio.addEventListener('ended', playNext);
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play();
+                updatePlayBtn(true);
+            } else {
+                audio.pause();
+                updatePlayBtn(false);
+            }
+        }
+
+        function updatePlayBtn(isPlaying) {
+            const pathPlay = '<path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />';
+            const pathPause = '<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />';
+            
+            const svg = `<svg class="w-full h-full p-2" fill="currentColor" viewBox="0 0 20 20">${isPlaying ? pathPause : pathPlay}</svg>`;
+            const svgBig = `<svg class="w-8 h-8 ml-${isPlaying ? '0' : '1'}" fill="currentColor" viewBox="0 0 20 20">${isPlaying ? pathPause : pathPlay}</svg>`;
+            
+            document.getElementById('mini-play-pause').innerHTML = svg;
+            document.getElementById('expanded-play-pause').innerHTML = svgBig;
+            
+            // Image Pulse
+            const expImg = document.getElementById('expanded-img');
+            if(isPlaying) expImg.classList.add('scale-105'); 
+            else expImg.classList.remove('scale-105');
+        }
+
+        // Progress & Seeking
+        audio.addEventListener('timeupdate', () => {
+            const per = (audio.currentTime / audio.duration) * 100;
+            
+            // Mini Progress
+            document.getElementById('mini-progress').style.width = `${per}%`;
+            
+            // Expanded Slider
+            const slider = document.getElementById('seek-slider');
+            if(document.activeElement !== slider) slider.value = per || 0;
+            
+            // Time Text
+            document.getElementById('expanded-current-time').innerText = formatTime(audio.currentTime);
+            document.getElementById('expanded-duration').innerText = formatTime(audio.duration || 0);
+        });
 
         document.getElementById('seek-slider').addEventListener('input', (e) => {
-            const val = e.target.value;
-            DOM.audio.currentTime = (val / 100) * DOM.audio.duration;
+            const time = (e.target.value / 100) * audio.duration;
+            audio.currentTime = time;
         });
 
+        audio.addEventListener('ended', () => {
+            if(currentSongIndex < currentQueue.length - 1) playFromQueue(currentSongIndex + 1);
+        });
+
+        // Expanded Player UI
+        function openExpandedPlayer() {
+            document.getElementById('expanded-player').classList.remove('translate-y-full');
+            document.body.style.overflow = 'hidden'; // prevent bg scrolling
+        }
+
+        function closeExpandedPlayer() {
+            document.getElementById('expanded-player').classList.add('translate-y-full');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Utils
         function formatTime(s) {
-            if(isNaN(s)) return "0:00";
             const min = Math.floor(s / 60);
             const sec = Math.floor(s % 60);
-            return `${min}:${sec < 10 ? '0'+sec : sec}`;
+            return `${min}:${sec < 10 ? '0' : ''}${sec}`;
         }
 
-        // --- Expanded Player Transitions ---
-        window.openExpandedPlayer = () => {
-            DOM.expandedPlayer.classList.remove('translate-y-full');
-            document.body.style.overflow = 'hidden';
+        // Lofi Logic (Web Audio API)
+        function toggleSlowedReverb() {
+            isLofi = !isLofi;
+            const toggle = document.querySelector('.lofi-toggle');
+            const knob = document.querySelector('.lofi-knob');
+            
+            if(isLofi) {
+                toggle.classList.replace('bg-white/20', 'bg-blue-500');
+                knob.classList.add('translate-x-4');
+                applyLofi();
+            } else {
+                toggle.classList.replace('bg-blue-500', 'bg-white/20');
+                knob.classList.remove('translate-x-4');
+                removeLofi();
+            }
         }
 
-        window.closeExpandedPlayer = () => {
-            DOM.expandedPlayer.classList.add('translate-y-full');
-            document.body.style.overflow = '';
+        function applyLofi() {
+            if (!audioContext) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioContext = new AudioContext();
+                sourceNode = audioContext.createMediaElementSource(audio);
+                sourceNode.connect(audioContext.destination);
+            }
+            
+            // Reverb Logic setup (simplified impulse)
+            if(!reverbNode) {
+                 reverbNode = audioContext.createConvolver();
+                 // Create dummy impulse response
+                 const rate = audioContext.sampleRate;
+                 const length = rate * 2; 
+                 const impulse = audioContext.createBuffer(2, length, rate);
+                 for (let i = 0; i < length; i++) {
+                     impulse.getChannelData(0)[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2);
+                     impulse.getChannelData(1)[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2);
+                 }
+                 reverbNode.buffer = impulse;
+            }
+
+            // Routing
+            sourceNode.disconnect();
+            const gainNode = audioContext.createGain();
+            gainNode.gain.value = 0.4; // Wet mix
+            
+            sourceNode.connect(audioContext.destination); // Dry
+            sourceNode.connect(reverbNode);
+            reverbNode.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            audio.playbackRate = 0.85;
+            audio.preservesPitch = false;
         }
 
+        function removeLofi() {
+            if(audioContext) {
+                audio.playbackRate = 1.0;
+                audio.preservesPitch = true;
+                // Disconnect reverb path if strictly needed, or just let playback rate handle it for basic toggle
+            }
+        }
     </script>
 </body>
 </html>
