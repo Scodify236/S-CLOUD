@@ -2,28 +2,19 @@
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S-CLOUD | Liquid</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>S-CLOUD</title>
     <link rel="icon" type="image/webp" href="logo.webp">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    animation: {
-                        'blob': 'blob 7s infinite',
-                    },
-                    keyframes: {
-                        blob: {
-                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
-                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
-                        }
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    animation: { 'fade-in': 'fadeIn 0.5s ease-out' },
+                    keyframes: { fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } } }
                 },
             },
         }
@@ -32,441 +23,484 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #000000;
-            overflow-x: hidden;
+            background-color: #050505;
+            color: white;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Ambient Background Glow */
-        .ambient-light {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: 
-                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(147, 51, 234, 0.15), transparent 25%);
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        /* Glassmorphism Utilities */
-        .glass-panel {
-            background: rgba(20, 20, 20, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .glass-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-
-        /* Scrollbar Hiding */
+        /* Hide Scrollbar but keep functionality */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Custom Range Slider for Lofi */
-        .lofi-toggle.active { background-color: rgba(59, 130, 246, 0.8); box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
-        
-        /* Audio visualizer bars animation */
-        .playing-indicator span {
-            animation: bounce 2.2s ease infinite alternate;
+        /* Dynamic Background */
+        .ambient-bg {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 50% -20%, #1e1e2e, #000000);
+            z-index: -2;
+            transition: background 1s ease;
         }
-        .playing-indicator span:nth-of-type(2) { animation-delay: -2.2s; }
-        .playing-indicator span:nth-of-type(3) { animation-delay: -3.7s; }
-        @keyframes bounce { 10% { transform: scaleY(0.3); } 30% { transform: scaleY(1); } 60% { transform: scaleY(0.5); } 80% { transform: scaleY(0.75); } 100% { transform: scaleY(0.6); } }
+
+        /* Glass Components */
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.65);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .glass-search {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Expanded Player Slide Animation */
+        #expanded-player {
+            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 12px; width: 12px;
+            border-radius: 50%;
+            background: #fff;
+            margin-top: -5px;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 2px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+        }
+
+        /* Loading Spinner */
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-left-color: #3b82f6;
+            border-radius: 50%;
+            width: 24px; height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="text-white min-h-screen selection:bg-blue-500 selection:text-white">
+<body class="h-screen overflow-hidden flex flex-col">
 
-    <div class="ambient-light"></div>
+    <div class="ambient-bg" id="dynamic-bg"></div>
 
-    <header class="fixed top-4 left-4 right-4 z-50">
-        <div class="glass-panel rounded-3xl max-w-7xl mx-auto px-6 py-4">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                
-                <div class="flex items-center gap-2">
-                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                    <h1 class="ml-4 text-xl font-bold tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">S-CLOUD</h1>
+    <header class="fixed top-0 left-0 right-0 z-30 pt-4 px-4 pb-2 bg-gradient-to-b from-black/80 to-transparent">
+        <div class="max-w-3xl mx-auto w-full">
+            <form id="search-form" class="relative group">
+                <input type="text" id="saavn-search-box" placeholder="Search for songs, artists..." 
+                    class="glass-search w-full text-white rounded-full py-3.5 pl-12 pr-4 focus:outline-none focus:bg-white/10 focus:border-white/20 transition-all placeholder-gray-400 text-sm font-medium shadow-lg">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
                 </div>
-
-                <form id="search-form" class="flex-1 max-w-xl w-full relative group">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-                    <input type="text" id="saavn-search-box" placeholder="Search tracks, artists..." 
-                        class="w-full bg-white/5 border border-white/10 text-white rounded-2xl py-2.5 pl-12 pr-4 focus:outline-none focus:bg-white/10 focus:border-blue-500/50 transition-all placeholder-gray-500 text-sm">
-                </form>
-
-                <div class="flex items-center gap-4">
-                    <select id="saavn-bitrate" class="bg-black/20 border border-white/10 text-xs text-gray-300 rounded-xl px-3 py-2 outline-none focus:border-blue-500 transition-colors cursor-pointer">
-                        <option value="4">High (320kbps)</option>
-                        <option value="3">Med (160kbps)</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="flex gap-2 overflow-x-auto hide-scrollbar mt-4 pb-1 mask-linear">
-                <button class="search-query-button whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all text-gray-300 hover:text-white">Hindi</button>
-                <button class="search-query-button whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all text-gray-300 hover:text-white">English</button>
-                <button class="search-query-button whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all text-gray-300 hover:text-white">Lo-Fi</button>
-                <button class="search-query-button whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all text-gray-300 hover:text-white">Punjabi</button>
-                <button class="search-query-button whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all text-gray-300 hover:text-white">Trending</button>
-                <button class="search-query-button whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all text-gray-300 hover:text-white">Arijit Singh</button>
-                <button class="search-query-button whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all text-gray-300 hover:text-white">The Weeknd</button>
-                <button class="search-query-button whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all text-gray-300 hover:text-white">Sidhu Moose Wala</button>
+            </form>
+            
+            <div class="flex gap-2 overflow-x-auto hide-scrollbar mt-3 pb-2 mask-linear">
+                <button class="tag-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/15 transition-all text-gray-300">Hindi</button>
+                <button class="tag-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/15 transition-all text-gray-300">English</button>
+                <button class="tag-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/15 transition-all text-gray-300">Punjabi</button>
+                <button class="tag-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/15 transition-all text-gray-300">Trending</button>
+                <button class="tag-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/15 transition-all text-gray-300">Lo-Fi</button>
+                <button class="tag-btn whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/5 hover:bg-white/15 transition-all text-gray-300">90s</button>
             </div>
         </div>
     </header>
 
-    <main class="pt-44 pb-36 px-4 max-w-7xl mx-auto">
-        <h2 class="text-2xl font-bold mb-6 text-white/90 px-2">Discover</h2>
-        <div id="saavn-results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+    <main class="flex-1 overflow-y-auto hide-scrollbar pt-32 pb-32 px-4" id="main-scroll">
+        <div class="max-w-7xl mx-auto">
+            <div id="saavn-results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6">
+                </div>
+            <div id="load-more-container" class="hidden justify-center mt-10 mb-10">
+                <button id="loadmore" class="px-6 py-2 rounded-full border border-white/10 text-sm hover:bg-white/10 transition-colors">Load More</button>
             </div>
-        
-        <div class="flex justify-center mt-12">
-            <button id="loadmore" class="glass-panel px-8 py-3 rounded-full text-sm font-semibold hover:bg-white/10 transition-all text-blue-400 hover:text-blue-300">Load More Music</button>
         </div>
     </main>
 
-    <footer class="fixed bottom-6 left-4 right-4 z-50">
-        <div class="glass-panel max-w-4xl mx-auto rounded-[2rem] p-3 shadow-2xl overflow-hidden relative group">
+    <div id="mini-player" class="fixed bottom-4 left-4 right-4 z-40 transform translate-y-[150%] transition-transform duration-500">
+        <div class="glass-panel max-w-2xl mx-auto rounded-2xl p-2 shadow-2xl flex items-center justify-between cursor-pointer" onclick="openExpandedPlayer()">
             
-            <div id="progress-container" class="absolute top-0 left-0 right-0 h-1 bg-white/5 cursor-pointer z-10 group-hover:h-2 transition-all">
-                <div id="progress" class="h-full bg-gradient-to-r from-blue-500 to-purple-500 w-0 shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
+            <div class="flex items-center flex-1 min-w-0">
+                <img id="mini-img" src="" class="w-10 h-10 rounded-lg object-cover bg-gray-800 shadow-md">
+                <div class="ml-3 flex-col flex overflow-hidden">
+                    <p id="mini-name" class="font-medium text-white text-sm truncate">Song Name</p>
+                    <p id="mini-artist" class="text-xs text-gray-400 truncate">Artist</p>
+                </div>
             </div>
 
-            <div class="flex items-center justify-between pl-2 pr-4 pt-2">
-                
-                <div class="flex items-center flex-1 min-w-0 mr-4">
-                    <div class="relative group/img">
-                        <img id="player-image" src="https://via.placeholder.com/150" alt="Cover" class="w-14 h-14 rounded-2xl object-cover shadow-lg border border-white/10">
-                        <div class="absolute inset-0 bg-black/40 rounded-2xl flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
-                            <div class="playing-indicator flex gap-0.5 h-3 items-end">
-                                <span class="w-1 bg-white rounded-full h-full"></span>
-                                <span class="w-1 bg-white rounded-full h-full"></span>
-                                <span class="w-1 bg-white rounded-full h-full"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ml-4 min-w-0 flex-col flex">
-                        <p id="player-name" class="font-semibold text-white text-sm truncate">Select a song</p>
-                        <p id="player-album" class="text-xs text-gray-400 truncate">S-Cloud Player</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-4 md:gap-6">
-                    <div class="hidden sm:flex items-center gap-2 group/lofi cursor-pointer" onclick="document.querySelector('.lofi-toggle').click()">
-                        <div class="lofi-toggle w-10 h-6 bg-black/40 rounded-full p-1 transition-all duration-300 border border-white/10">
-                            <div class="lofi-toggle-knob w-4 h-4 bg-gray-400 rounded-full shadow-sm transition-transform duration-300"></div>
-                        </div>
-                        <span class="text-[10px] font-bold tracking-wider text-gray-500 group-hover/lofi:text-gray-300 uppercase">Slowed</span>
-                    </div>
-
-                    <button id="play-pause" class="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-                        <svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                        </svg>
-                    </button>
-
-                    <div class="text-[10px] font-mono text-gray-400 hidden sm:block w-20 text-right">
-                        <span id="current-time">0:00</span> / <span id="duration">0:00</span>
-                    </div>
-                </div>
+            <div class="flex items-center gap-3 pr-2" onclick="event.stopPropagation()">
+                <button id="mini-play-pause" class="w-8 h-8 flex items-center justify-center bg-white text-black rounded-full hover:scale-105 transition-transform">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>
+                </button>
+            </div>
+            
+            <div class="absolute bottom-0 left-2 right-2 h-[2px] bg-white/10 rounded-full overflow-hidden">
+                <div id="mini-progress" class="h-full bg-white/80 w-0 transition-all duration-100"></div>
             </div>
         </div>
-    </footer>
+    </div>
 
-    <audio id="player" crossorigin="anonymous">
-        <source id="audioSource" src="" type="audio/mp3">
-    </audio>
+    <div id="expanded-player" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-3xl transform translate-y-full flex flex-col">
+        <div class="flex items-center justify-between p-6 mt-2">
+            <button onclick="closeExpandedPlayer()" class="text-white/70 hover:text-white p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <span class="text-xs font-bold tracking-widest text-white/50 uppercase">Now Playing</span>
+            <button class="text-white/70 hover:text-white p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+            </button>
+        </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <div class="flex-1 flex flex-col items-center justify-center px-8 pb-10">
+            <div class="w-full max-w-sm aspect-square relative mb-8 group">
+                <img id="expanded-img" src="" class="w-full h-full object-cover rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform transition-transform duration-500 scale-100" crossorigin="anonymous">
+            </div>
+
+            <div class="w-full max-w-sm mb-6 text-left">
+                <h2 id="expanded-name" class="text-2xl font-bold text-white mb-1 line-clamp-1">Song Name</h2>
+                <p id="expanded-artist" class="text-lg text-white/60 line-clamp-1">Artist Name</p>
+            </div>
+
+            <div class="w-full max-w-sm mb-6 group">
+                <input type="range" id="seek-slider" min="0" max="100" value="0" class="w-full h-1 bg-white/20 rounded-lg cursor-pointer appearance-none">
+                <div class="flex justify-between text-xs text-white/40 font-mono mt-2">
+                    <span id="expanded-current-time">0:00</span>
+                    <span id="expanded-duration">0:00</span>
+                </div>
+            </div>
+
+            <div class="w-full max-w-sm flex items-center justify-between mb-8">
+                <button class="text-white/40 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg></button>
+                
+                <button id="prev-btn" class="text-white hover:text-white/80 transition"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+                
+                <button id="expanded-play-pause" class="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 transition shadow-lg shadow-white/10">
+                    <svg class="w-8 h-8 ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>
+                </button>
+                
+                <button id="next-btn" class="text-white hover:text-white/80 transition"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+                
+                <button class="text-white/40 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg></button>
+            </div>
+
+            <div class="flex items-center gap-3 cursor-pointer p-2 rounded-xl bg-white/5 hover:bg-white/10 transition" onclick="toggleSlowedReverb()">
+                <div class="lofi-toggle w-8 h-4 bg-white/20 rounded-full relative transition-colors">
+                    <div class="lofi-knob w-4 h-4 bg-white rounded-full shadow-sm absolute top-0 left-0 transition-transform"></div>
+                </div>
+                <span class="text-xs font-semibold text-white/60 uppercase tracking-wide">Slowed & Reverb</span>
+            </div>
+        </div>
+    </div>
+
+    <audio id="player" crossorigin="anonymous"></audio>
+
     <script>
-        let audioContext;
-        let sourceNode;
-        let reverbNode;
-        let slowedReverbEnabled = false;
-        let lastSearch = '';
+        // --- Variables ---
+        const audio = document.getElementById('player');
+        const searchInput = document.getElementById('saavn-search-box');
+        const resultsContainer = document.getElementById('saavn-results');
+        const colorThief = new ColorThief();
         
-        document.getElementById('search-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            SaavnSearch();
+        // State
+        let currentQueue = [];
+        let currentSongIndex = -1;
+        let lastSearch = 'trending';
+        let pageIndex = 1;
+        let isLofi = false;
+        let audioContext, sourceNode, reverbNode;
+
+        // --- Logic ---
+
+        // Initialize
+        window.addEventListener('load', () => {
+            if (window.location.hash) doSearch(window.location.hash.substring(1));
+            else doSearch('trending');
         });
 
-        function handleSearchQueryClick(query) {
-            document.querySelector("#saavn-search-box").value = query;
-            SaavnSearch();
-        }
+        // Search Handlers
+        document.getElementById('search-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const q = searchInput.value.trim();
+            if(q) doSearch(q);
+        });
 
-        document.querySelectorAll('.search-query-button').forEach(button => {
-            button.addEventListener('click', function() {
-                handleSearchQueryClick(this.textContent);
+        document.querySelectorAll('.tag-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                searchInput.value = btn.innerText;
+                doSearch(btn.innerText);
             });
         });
 
-        var results_container = document.querySelector("#saavn-results");
-        var results_objects = {};
-        const searchUrl = "https://jiosaavn-api-privatecvc2.vercel.app/search/songs?query=";
+        document.getElementById('loadmore').addEventListener('click', () => {
+            doSearch(lastSearch, true);
+        });
 
-        function SaavnSearch() {
-            var query = document.querySelector("#saavn-search-box").value.trim();
-            query = encodeURIComponent(query);
-            if (query.length > 0) {
+        // Search Function
+        async function doSearch(query, isNextPage = false) {
+            if(!isNextPage) {
                 window.location.hash = query;
-                doSaavnSearch(query);
-            }
-        }
-
-        var page_index = 1;
-        function nextPage() {
-            var query = document.querySelector("#saavn-search-box").value.trim();
-            if (!query) query = lastSearch;
-            query = encodeURIComponent(query);
-            doSaavnSearch(query, 0, true);
-        }
-
-        async function doSaavnSearch(query, NotScroll, page) {
-            window.location.hash = query;
-            document.querySelector("#saavn-search-box").value = decodeURIComponent(query);
-            if (!query) return;
-
-            if (!page) {
-                results_container.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-500">
-                    <div class="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p>Fetching beats...</p>
-                </div>`;
-            }
-
-            query = query + "&limit=40";
-            if (page) {
-                page_index++;
-                query = query + "&page=" + page_index;
+                lastSearch = query;
+                pageIndex = 1;
+                resultsContainer.innerHTML = '<div class="col-span-full flex justify-center py-20"><div class="loader"></div></div>';
+                document.getElementById('load-more-container').classList.add('hidden');
             } else {
-                query = query + "&page=1";
-                page_index = 1;
-                results_container.innerHTML = '';
+                pageIndex++;
             }
 
             try {
-                var response = await fetch(searchUrl + query);
-                var json = await response.json();
-                if (response.status !== 200) throw new Error(json.message);
-                var results = json.data.results;
-                if (!results || results.length === 0) {
-                    results_container.innerHTML = "<p class='col-span-full text-center text-gray-500 py-10'>No music found.</p>";
-                    return;
+                // Fetching forced 320kbps via API logic usually handled by setting bitrate=4 in requests or filtering download links
+                const res = await fetch(`https://jiosaavn-api-privatecvc2.vercel.app/search/songs?query=${encodeURIComponent(query)}&page=${pageIndex}&limit=30`);
+                const data = await res.json();
+                
+                if(!isNextPage) resultsContainer.innerHTML = '';
+                
+                if(data.data.results.length > 0) {
+                    currentQueue = isNextPage ? [...currentQueue, ...data.data.results] : data.data.results;
+                    renderResults(data.data.results, isNextPage);
+                    document.getElementById('load-more-container').classList.remove('hidden');
+                } else {
+                    if(!isNextPage) resultsContainer.innerHTML = '<div class="col-span-full text-center text-white/50 py-10">No results found.</div>';
                 }
-                lastSearch = decodeURI(window.location.hash.substring(1));
-                displayResults(results);
-            } catch (error) {
-                results_container.innerHTML = `<div class="col-span-full text-center text-red-400 py-10">Error loading music.</div>`;
-                console.error(error);
-            }
-
-            if (!NotScroll) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (e) {
+                console.error(e);
             }
         }
 
-        function displayResults(results) {
-            let resultsHTML = '';
-            for (let track of results) {
-                let song_name = track.name;
-                let album_name = track.album.name == track.name ? "" : track.album.name;
-                let play_time = formatTime(track.duration);
-                let song_id = track.id;
-                let year = track.year;
-                let song_image = track.image[2].link;
-                let song_artist = track.primaryArtists;
-                let bitrate = document.getElementById('saavn-bitrate');
-                let bitrate_i = bitrate.options[bitrate.selectedIndex].value;
+        function renderResults(songs, append) {
+            let html = '';
+            // Calculate starting index for the new batch
+            let startIndex = append ? currentQueue.length - songs.length : 0;
+
+            songs.forEach((song, idx) => {
+                // Get 320kbps link if available, else highest
+                let downloadUrl = song.downloadUrl.find(u => u.quality === "320kbps")?.link || song.downloadUrl[song.downloadUrl.length-1].link;
+                let img = song.image[2].link; // 500x500
                 
-                if (track.downloadUrl) {
-                    let download_url = track.downloadUrl[bitrate_i]['link'];
-                    results_objects[song_id] = { track: track };
-                    
-                    resultsHTML += `
-                    <div class="glass-card rounded-3xl overflow-hidden cursor-pointer group relative" data-song-id="${song_id}" data-download-url="${download_url}">
-                        <div class="aspect-square overflow-hidden relative">
-                            <img src="${song_image}" alt="${song_name}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
-                            <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 backdrop-blur-[2px]">
-                                <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 text-white">
-                                    <svg class="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                </div>
+                html += `
+                <div class="group relative cursor-pointer animate-fade-in" onclick="playFromQueue(${startIndex + idx})">
+                    <div class="aspect-square rounded-2xl overflow-hidden bg-white/5 relative mb-3">
+                        <img src="${img}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110 group-hover:opacity-60" loading="lazy">
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                            <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>
                             </div>
-                            <span class="absolute bottom-2 right-2 text-[10px] font-bold bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded-md border border-white/10">${play_time}</span>
-                        </div>
-                        <div class="p-4">
-                            <h3 class="font-bold text-sm text-white truncate group-hover:text-blue-400 transition-colors">${song_name}</h3>
-                            <p class="text-xs text-gray-400 truncate mt-1">${song_artist}</p>
-                            <p class="text-[10px] text-gray-600 mt-2 flex justify-between"><span>${year}</span> <span>${album_name}</span></p>
                         </div>
                     </div>
-                    `;
+                    <h3 class="font-medium text-white text-sm truncate pr-2">${song.name}</h3>
+                    <p class="text-xs text-gray-400 truncate">${song.primaryArtists}</p>
+                </div>`;
+            });
+            
+            resultsContainer.innerHTML += html;
+        }
+
+        // --- Player Logic ---
+
+        function playFromQueue(index) {
+            currentSongIndex = index;
+            loadTrack(currentQueue[index]);
+        }
+
+        function loadTrack(track) {
+            // Get URL (Prefer 320kbps)
+            let url = track.downloadUrl.find(u => u.quality === "320kbps")?.link || track.downloadUrl[track.downloadUrl.length-1].link;
+            let img = track.image[2].link;
+
+            audio.src = url;
+            audio.play();
+
+            // Update UI
+            document.getElementById('mini-player').classList.remove('translate-y-[150%]');
+            
+            // Mini Player Data
+            document.getElementById('mini-img').src = img;
+            document.getElementById('mini-name').innerText = track.name;
+            document.getElementById('mini-artist').innerText = track.primaryArtists;
+
+            // Expanded Player Data
+            document.getElementById('expanded-img').src = img;
+            document.getElementById('expanded-name').innerText = track.name;
+            document.getElementById('expanded-artist').innerText = track.primaryArtists;
+
+            // Extract Colors
+            extractColor(img);
+
+            updatePlayBtn(true);
+            
+            // Re-apply lofi if active
+            if(isLofi) applyLofi();
+        }
+
+        function extractColor(imgUrl) {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.src = imgUrl;
+            img.onload = function() {
+                try {
+                    const color = colorThief.getColor(img);
+                    const rgb = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+                    // Apply to expanded player gradient
+                    document.getElementById('expanded-player').style.background = `linear-gradient(to bottom, ${rgb}, #000)`;
+                    // Apply subtle glow to body
+                    document.getElementById('dynamic-bg').style.background = `radial-gradient(circle at 50% -20%, ${rgb}, #050505)`;
+                } catch (e) {
+                    console.log("CORS blocked color extraction, using default.");
+                    document.getElementById('expanded-player').style.background = "#050505";
                 }
             }
-            results_container.innerHTML += resultsHTML;
-
-            document.querySelectorAll('.glass-card').forEach(container => {
-                container.addEventListener('click', function() {
-                    PlayAudio(this.dataset.downloadUrl, this.dataset.songId);
-                });
-            });
         }
 
-        function PlayAudio(audio_url, song_id) {
-            var source = document.getElementById('audioSource');
-            source.src = audio_url;
-            var track = results_objects[song_id].track;
-            
-            document.title = track.name + " • S-CLOUD";
-            document.getElementById("player-name").textContent = track.name;
-            document.getElementById("player-album").textContent = track.primaryArtists; // Showing artist instead of album for cleaner look
-            document.getElementById("player-image").src = track.image[2].link;
-
-            var audio = document.getElementById('player');
-            audio.load();
-            audio.play().catch(e => console.error(e));
-            updatePlayPauseButton(true);
-
-            if (slowedReverbEnabled) applySlowedReverbEffect();
-            else removeSlowedReverbEffect();
-        }
-
-        document.getElementById('loadmore').addEventListener('click', nextPage);
-
-        const audio = document.getElementById('player');
-        const progressBar = document.getElementById('progress-container');
-        const progress = document.getElementById('progress');
-        const currentTimeElement = document.getElementById('current-time');
-        const durationElement = document.getElementById('duration');
-        const playPauseButton = document.getElementById('play-pause');
-        const slowedReverbToggle = document.querySelector('.lofi-toggle');
-
-        playPauseButton.addEventListener('click', togglePlayPause);
-        audio.addEventListener('timeupdate', updateProgress);
-        audio.addEventListener('loadedmetadata', () => {
-            durationElement.textContent = formatTime(audio.duration);
+        // Controls
+        document.getElementById('mini-play-pause').addEventListener('click', togglePlay);
+        document.getElementById('expanded-play-pause').addEventListener('click', togglePlay);
+        
+        document.getElementById('next-btn').addEventListener('click', () => {
+            if(currentSongIndex < currentQueue.length - 1) playFromQueue(currentSongIndex + 1);
         });
-        progressBar.addEventListener('click', seek);
-        slowedReverbToggle.addEventListener('click', toggleSlowedReverb);
+        
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            if(currentSongIndex > 0) playFromQueue(currentSongIndex - 1);
+        });
 
-        function togglePlayPause() {
+        function togglePlay() {
             if (audio.paused) {
                 audio.play();
-                updatePlayPauseButton(true);
+                updatePlayBtn(true);
             } else {
                 audio.pause();
-                updatePlayPauseButton(false);
+                updatePlayBtn(false);
             }
         }
 
-        function updatePlayPauseButton(isPlaying) {
-            playPauseButton.innerHTML = isPlaying
-                ? '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>'
-                : '<svg class="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>';
-        }
-
-        function updateProgress() {
-            if (!isNaN(audio.duration)) {
-                const progressPercent = (audio.currentTime / audio.duration) * 100;
-                progress.style.width = `${progressPercent}%`;
-                currentTimeElement.textContent = formatTime(audio.currentTime);
-            }
-        }
-
-        function seek(e) {
-            const width = this.clientWidth;
-            const clickX = e.offsetX;
-            const duration = audio.duration;
-            audio.currentTime = (clickX / width) * duration;
-        }
-
-        function formatTime(time) {
-            if(isNaN(time)) return "0:00";
-            const minutes = Math.floor(time / 60);
-            const seconds = Math.floor(time % 60);
-            return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-        }
-
-        function toggleSlowedReverb() {
-            slowedReverbEnabled = !slowedReverbEnabled;
-            const toggle = document.querySelector('.lofi-toggle');
-            const knob = document.querySelector('.lofi-toggle-knob');
+        function updatePlayBtn(isPlaying) {
+            const pathPlay = '<path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />';
+            const pathPause = '<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />';
             
-            if (slowedReverbEnabled) {
-                toggle.classList.add('active');
-                knob.style.transform = 'translateX(16px)';
-                knob.style.backgroundColor = '#ffffff';
-                applySlowedReverbEffect();
+            const svg = `<svg class="w-full h-full p-2" fill="currentColor" viewBox="0 0 20 20">${isPlaying ? pathPause : pathPlay}</svg>`;
+            const svgBig = `<svg class="w-8 h-8 ml-${isPlaying ? '0' : '1'}" fill="currentColor" viewBox="0 0 20 20">${isPlaying ? pathPause : pathPlay}</svg>`;
+            
+            document.getElementById('mini-play-pause').innerHTML = svg;
+            document.getElementById('expanded-play-pause').innerHTML = svgBig;
+            
+            // Image Pulse
+            const expImg = document.getElementById('expanded-img');
+            if(isPlaying) expImg.classList.add('scale-105'); 
+            else expImg.classList.remove('scale-105');
+        }
+
+        // Progress & Seeking
+        audio.addEventListener('timeupdate', () => {
+            const per = (audio.currentTime / audio.duration) * 100;
+            
+            // Mini Progress
+            document.getElementById('mini-progress').style.width = `${per}%`;
+            
+            // Expanded Slider
+            const slider = document.getElementById('seek-slider');
+            if(document.activeElement !== slider) slider.value = per || 0;
+            
+            // Time Text
+            document.getElementById('expanded-current-time').innerText = formatTime(audio.currentTime);
+            document.getElementById('expanded-duration').innerText = formatTime(audio.duration || 0);
+        });
+
+        document.getElementById('seek-slider').addEventListener('input', (e) => {
+            const time = (e.target.value / 100) * audio.duration;
+            audio.currentTime = time;
+        });
+
+        audio.addEventListener('ended', () => {
+            if(currentSongIndex < currentQueue.length - 1) playFromQueue(currentSongIndex + 1);
+        });
+
+        // Expanded Player UI
+        function openExpandedPlayer() {
+            document.getElementById('expanded-player').classList.remove('translate-y-full');
+            document.body.style.overflow = 'hidden'; // prevent bg scrolling
+        }
+
+        function closeExpandedPlayer() {
+            document.getElementById('expanded-player').classList.add('translate-y-full');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Utils
+        function formatTime(s) {
+            const min = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
+            return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+
+        // Lofi Logic (Web Audio API)
+        function toggleSlowedReverb() {
+            isLofi = !isLofi;
+            const toggle = document.querySelector('.lofi-toggle');
+            const knob = document.querySelector('.lofi-knob');
+            
+            if(isLofi) {
+                toggle.classList.replace('bg-white/20', 'bg-blue-500');
+                knob.classList.add('translate-x-4');
+                applyLofi();
             } else {
-                toggle.classList.remove('active');
-                knob.style.transform = 'translateX(0)';
-                knob.style.backgroundColor = '#9ca3af';
-                removeSlowedReverbEffect();
+                toggle.classList.replace('bg-blue-500', 'bg-white/20');
+                knob.classList.remove('translate-x-4');
+                removeLofi();
             }
         }
 
-        function applySlowedReverbEffect() {
+        function applyLofi() {
             if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioContext = new AudioContext();
                 sourceNode = audioContext.createMediaElementSource(audio);
-            }
-            if (!reverbNode) {
-                reverbNode = audioContext.createConvolver();
-                const length = audioContext.sampleRate * 3; 
-                const impulse = audioContext.createBuffer(2, length, audioContext.sampleRate);
-                for (let channel = 0; channel < 2; channel++) {
-                    const data = impulse.getChannelData(channel);
-                    for (let i = 0; i < length; i++) {
-                        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2);
-                    }
-                }
-                reverbNode.buffer = impulse;
-            }
-
-            const gainNode = audioContext.createGain();
-            gainNode.gain.value = 0.7; // Mix wet/dry
-
-            audio.preservesPitch = false;
-            audio.playbackRate = 0.88; // Slowed down
-
-            sourceNode.disconnect();
-            sourceNode.connect(gainNode);
-            gainNode.connect(audioContext.destination); // Dry
-            sourceNode.connect(reverbNode);
-            reverbNode.connect(audioContext.destination); // Wet
-        }
-
-        function removeSlowedReverbEffect() {
-            audio.playbackRate = 1;
-            audio.preservesPitch = true;
-            if (sourceNode) {
-                sourceNode.disconnect();
                 sourceNode.connect(audioContext.destination);
             }
+            
+            // Reverb Logic setup (simplified impulse)
+            if(!reverbNode) {
+                 reverbNode = audioContext.createConvolver();
+                 // Create dummy impulse response
+                 const rate = audioContext.sampleRate;
+                 const length = rate * 2; 
+                 const impulse = audioContext.createBuffer(2, length, rate);
+                 for (let i = 0; i < length; i++) {
+                     impulse.getChannelData(0)[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2);
+                     impulse.getChannelData(1)[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2);
+                 }
+                 reverbNode.buffer = impulse;
+            }
+
+            // Routing
+            sourceNode.disconnect();
+            const gainNode = audioContext.createGain();
+            gainNode.gain.value = 0.4; // Wet mix
+            
+            sourceNode.connect(audioContext.destination); // Dry
+            sourceNode.connect(reverbNode);
+            reverbNode.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            audio.playbackRate = 0.85;
+            audio.preservesPitch = false;
         }
 
-        // Init
-        if (window.location.hash) doSaavnSearch(window.location.hash.substring(1));
-        else doSaavnSearch('hindi', 1);
-
-        window.addEventListener('hashchange', () => doSaavnSearch(window.location.hash.substring(1)));
-        document.getElementById('saavn-bitrate').addEventListener('change', () => doSaavnSearch(lastSearch));
+        function removeLofi() {
+            if(audioContext) {
+                audio.playbackRate = 1.0;
+                audio.preservesPitch = true;
+                // Disconnect reverb path if strictly needed, or just let playback rate handle it for basic toggle
+            }
+        }
     </script>
 </body>
 </html>
