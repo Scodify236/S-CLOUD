@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Credit Management</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      background: white;
+      padding: 25px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    
+    h1 {
+      color: #2c3e50;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .stat-card {
+      border-left: 4px solid #3498db;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: #7f8c8d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    
+    .stat-value {
+      font-size: 32px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    
+    .form-section {
+      margin-bottom: 30px;
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    label {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #555;
+    }
+    
+    input, select, textarea {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+    
+    button {
+      background: #3498db;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    button:hover {
+      background: #2980b9;
+    }
+    
+    button.secondary {
+      background: #95a5a6;
+    }
+    
+    button.secondary:hover {
+      background: #7f8c8d;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+    
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ecf0f1;
+    }
+    
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #555;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    tr:hover {
+      background: #f8f9fa;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .badge.credit { background: #e8f5e9; color: #2e7d32; }
+    .badge.debit { background: #ffebee; color: #c62828; }
+    .badge.advance { background: #e3f2fd; color: #1565c0; }
+    
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+    
+    .message {
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    
+    .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #ecf0f1;
+    }
+    
+    .tab {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      color: #7f8c8d;
+      cursor: pointer;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+    
+    .tab.active {
+      color: #3498db;
+      border-bottom-color: #3498db;
+    }
+    
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>📊 Customer Credit Management</h1>
+    </div>
+  </header>
+  
+  <div class="container">
+    <div id="message"></div>
+    
+    <div class="dashboard">
+      <div class="card stat-card">
+        <div class="stat-label">Total Customers</div>
+        <div class="stat-value" id="totalCustomers">0</div>
+      </div>
+      <div class="card stat-card" style="border-left-color: #27ae60;">
+        <div class="stat-label">Total Credits</div>
+        <div class="stat-value" id="totalCredits">₹0</div>
+      </div>
+      <div class="card stat-card" style="border-left-color: #e74c3c;">
+        <div class="stat-label">Total Advances</div>
+        <div class="stat-value" id="totalAdvances">₹0</div>
+      </div>
+    </div>
+    
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('customers')">Customers</button>
+      <button class="tab" onclick="showTab('transactions')">Transactions</button>
+    </div>
+    
+    <div id="customersTab">
+      <div class="card form-section">
+        <h2 style="margin-bottom: 20px; color: #2c3e50;">Add New Customer</h2>
+        <form id="customerForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Name *</label>
+              <input type="text" name="name" required>
+            </div>
+            <div class="form-group">
+              <label>Email *</label>
+              <input type="email" name="email" required>
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" name="phone">
+            </div>
+            <div class="form-group">
+              <label>Initial Credit</label>
+              <input type="number" name="credit_amount" step="0.01" value="0">
+            </div>
+            <div class="form-group">
+              <label>Advance Payment</label>
+              <input type="number" name="advance_payment" step="0.01" value="0">
+            </div>
+          </div>
+          <button type="submit">Add Customer</button>
+        </form>
+      </div>
+      
+      <div class="card">
+        <h2 style="margin-bottom: 20px; color: #2c3e50;">All Customers</h2>
+        <div class="table-container">
+          <table id="customersTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Credit</th>
+                <th>Advance</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <div id="transactionsTab" class="hidden">
+      <div class="card form-section">
+        <h2 style="margin-bottom: 20px; color: #2c3e50;">Add Transaction</h2>
+        <form id="transactionForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Customer *</label>
+              <select name="customer_id" id="customerSelect" required></select>
+            </div>
+            <div class="form-group">
+              <label>Type *</label>
+              <select name="type" required>
+                <option value="credit">Credit</option>
+                <option value="debit">Debit</option>
+                <option value="advance">Advance Payment</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Amount *</label>
+              <input type="number" name="amount" step="0.01" required>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 15px;">
+            <label>Description</label>
+            <textarea name="description" rows="2"></textarea>
+          </div>
+          <button type="submit">Add Transaction</button>
+        </form>
+      </div>
+      
+      <div class="card">
+        <h2 style="margin-bottom: 20px; color: #2c3e50;">Recent Transactions</h2>
+        <div class="table-container">
+          <table id="transactionsTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const BASE_URL = window.location.origin + window.location.pathname.replace(/\\/$/, '');
+    let customers = [];
+    let transactions = [];
+    
+    function showMessage(text, type = 'success') {
+      const msg = document.getElementById('message');
+      msg.className = 'message ' + type;
+      msg.textContent = text;
+      setTimeout(() => msg.textContent = '', 5000);
+    }
+    
+    function showTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      document.getElementById('customersTab').classList.toggle('hidden', tab !== 'customers');
+      document.getElementById('transactionsTab').classList.toggle('hidden', tab !== 'transactions');
+    }
+    
+    async function loadData() {
+      try {
+        const [custRes, transRes, statsRes] = await Promise.all([
+          fetch(BASE_URL + '/api/customers'),
+          fetch(BASE_URL + '/api/transactions'),
+          fetch(BASE_URL + '/api/stats')
+        ]);
+        
+        customers = await custRes.json();
+        transactions = await transRes.json();
+        const stats = await statsRes.json();
+        
+        document.getElementById('totalCustomers').textContent = stats.totalCustomers;
+        document.getElementById('totalCredits').textContent = '₹' + stats.totalCredits.toFixed(2);
+        document.getElementById('totalAdvances').textContent = '₹' + stats.totalAdvances.toFixed(2);
+        
+        renderCustomers();
+        renderTransactions();
+        updateCustomerSelect();
+      } catch (err) {
+        showMessage('Error loading data: ' + err.message, 'error');
+      }
+    }
+    
+    function renderCustomers() {
+      const tbody = document.querySelector('#customersTable tbody');
+      tbody.innerHTML = customers.map(c => \`
+        <tr>
+          <td>\${c.id}</td>
+          <td>\${c.name}</td>
+          <td>\${c.email}</td>
+          <td>\${c.phone || '-'}</td>
+          <td>₹\${parseFloat(c.credit_amount).toFixed(2)}</td>
+          <td>₹\${parseFloat(c.advance_payment).toFixed(2)}</td>
+          <td class="actions">
+            <button class="btn-small secondary" onclick="deleteCustomer(\${c.id})">Delete</button>
+          </td>
+        </tr>
+      \`).join('');
+    }
+    
+    function renderTransactions() {
+      const tbody = document.querySelector('#transactionsTable tbody');
+      tbody.innerHTML = transactions.map(t => {
+        const customer = customers.find(c => c.id === t.customer_id);
+        return \`
+          <tr>
+            <td>\${t.id}</td>
+            <td>\${customer ? customer.name : 'Unknown'}</td>
+            <td><span class="badge \${t.type}">\${t.type.toUpperCase()}</span></td>
+            <td>₹\${parseFloat(t.amount).toFixed(2)}</td>
+            <td>\${t.description || '-'}</td>
+            <td>\${new Date(t.created_at).toLocaleDateString()}</td>
+          </tr>
+        \`;
+      }).join('');
+    }
+    
+    function updateCustomerSelect() {
+      const select = document.getElementById('customerSelect');
+      select.innerHTML = '<option value="">Select customer...</option>' + 
+        customers.map(c => \`<option value="\${c.id}">\${c.name} - \${c.email}</option>\`).join('');
+    }
+    
+    document.getElementById('customerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData);
+      
+      try {
+        const res = await fetch(BASE_URL + '/api/customers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (res.ok) {
+          showMessage('Customer added successfully!');
+          e.target.reset();
+          loadData();
+        } else {
+          const err = await res.json();
+          showMessage(err.error || 'Error adding customer', 'error');
+        }
+      } catch (err) {
+        showMessage('Error: ' + err.message, 'error');
+      }
+    });
+    
+    document.getElementById('transactionForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData);
+      
+      try {
+        const res = await fetch(BASE_URL + '/api/transactions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (res.ok) {
+          showMessage('Transaction added successfully!');
+          e.target.reset();
+          loadData();
+        } else {
+          const err = await res.json();
+          showMessage(err.error || 'Error adding transaction', 'error');
+        }
+      } catch (err) {
+        showMessage('Error: ' + err.message, 'error');
+      }
+    });
+    
+    async function deleteCustomer(id) {
+      if (!confirm('Are you sure you want to delete this customer?')) return;
+      
+      try {
+        const res = await fetch(BASE_URL + \`/api/customers/\${id}\`, { method: 'DELETE' });
+        if (res.ok) {
+          showMessage('Customer deleted successfully!');
+          loadData();
+        } else {
+          showMessage('Error deleting customer', 'error');
+        }
+      } catch (err) {
+        showMessage('Error: ' + err.message, 'error');
+      }
+    }
+    
+    loadData();
+  </script>
+</body>
+</html>
