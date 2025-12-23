@@ -5,56 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Customer Credit Management</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       background: #f5f5f5;
       color: #333;
       line-height: 1.6;
     }
-    
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
     header {
       background: white;
       padding: 25px 0;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       margin-bottom: 30px;
     }
-    
-    h1 {
-      color: #2c3e50;
-      font-size: 28px;
+    h1 { 
+      color: #2c3e50; 
+      font-size: 28px; 
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    
+    .icon { font-size: 32px; }
     .dashboard {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 20px;
       margin-bottom: 30px;
     }
-    
     .card {
       background: white;
       padding: 25px;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
-    
-    .stat-card {
+    .stat-card { 
       border-left: 4px solid #3498db;
+      display: flex;
+      align-items: center;
+      gap: 20px;
     }
-    
+    .stat-icon {
+      font-size: 48px;
+      opacity: 0.8;
+    }
+    .stat-content { flex: 1; }
     .stat-label {
       font-size: 14px;
       color: #7f8c8d;
@@ -62,36 +58,16 @@
       letter-spacing: 0.5px;
       margin-bottom: 8px;
     }
-    
-    .stat-value {
-      font-size: 32px;
-      font-weight: 600;
-      color: #2c3e50;
-    }
-    
-    .form-section {
-      margin-bottom: 30px;
-    }
-    
+    .stat-value { font-size: 32px; font-weight: 600; color: #2c3e50; }
+    .form-section { margin-bottom: 30px; }
     .form-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 15px;
       margin-bottom: 15px;
     }
-    
-    .form-group {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    label {
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 6px;
-      color: #555;
-    }
-    
+    .form-group { display: flex; flex-direction: column; }
+    label { font-size: 14px; font-weight: 500; margin-bottom: 6px; color: #555; }
     input, select, textarea {
       padding: 10px 12px;
       border: 1px solid #ddd;
@@ -99,12 +75,10 @@
       font-size: 14px;
       transition: border-color 0.2s;
     }
-    
     input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: #3498db;
     }
-    
     button {
       background: #3498db;
       color: white;
@@ -116,35 +90,14 @@
       cursor: pointer;
       transition: background 0.2s;
     }
-    
-    button:hover {
-      background: #2980b9;
-    }
-    
-    button.secondary {
-      background: #95a5a6;
-    }
-    
-    button.secondary:hover {
-      background: #7f8c8d;
-    }
-    
-    .table-container {
-      overflow-x: auto;
-    }
-    
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-    }
-    
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #ecf0f1;
-    }
-    
+    button:hover { background: #2980b9; }
+    button.secondary { background: #95a5a6; }
+    button.secondary:hover { background: #7f8c8d; }
+    button.danger { background: #e74c3c; }
+    button.danger:hover { background: #c0392b; }
+    .table-container { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; background: white; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ecf0f1; }
     th {
       background: #f8f9fa;
       font-weight: 600;
@@ -153,11 +106,7 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    
-    tr:hover {
-      background: #f8f9fa;
-    }
-    
+    tr:hover { background: #f8f9fa; }
     .badge {
       display: inline-block;
       padding: 4px 10px;
@@ -165,38 +114,25 @@
       font-size: 12px;
       font-weight: 500;
     }
-    
     .badge.credit { background: #e8f5e9; color: #2e7d32; }
     .badge.debit { background: #ffebee; color: #c62828; }
     .badge.advance { background: #e3f2fd; color: #1565c0; }
-    
-    .actions {
-      display: flex;
-      gap: 8px;
-    }
-    
-    .btn-small {
-      padding: 6px 12px;
-      font-size: 12px;
-    }
-    
+    .actions { display: flex; gap: 8px; }
+    .btn-small { padding: 6px 12px; font-size: 12px; }
     .message {
       padding: 12px 16px;
       border-radius: 4px;
       margin-bottom: 20px;
       font-size: 14px;
     }
-    
     .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
     .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    
     .tabs {
       display: flex;
       gap: 10px;
       margin-bottom: 20px;
       border-bottom: 2px solid #ecf0f1;
     }
-    
     .tab {
       padding: 12px 20px;
       background: none;
@@ -206,22 +142,56 @@
       font-weight: 500;
       border-bottom: 2px solid transparent;
       margin-bottom: -2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    
-    .tab.active {
-      color: #3498db;
-      border-bottom-color: #3498db;
+    .tab.active { color: #3498db; border-bottom-color: #3498db; }
+    .hidden { display: none; }
+    .customer-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    
-    .hidden {
-      display: none;
+    .customer-info h3 {
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
+    .customer-info p {
+      color: #7f8c8d;
+      font-size: 14px;
+      margin: 3px 0;
+    }
+    .customer-balance {
+      text-align: right;
+    }
+    .balance-item {
+      margin: 5px 0;
+    }
+    .balance-label {
+      font-size: 12px;
+      color: #7f8c8d;
+      text-transform: uppercase;
+    }
+    .balance-value {
+      font-size: 20px;
+      font-weight: 600;
+      color: #2c3e50;
     }
   </style>
 </head>
 <body>
   <header>
     <div class="container">
-      <h1>📊 Customer Credit Management</h1>
+      <h1>
+        <span class="icon">📊</span>
+        Customer Credit Management
+      </h1>
     </div>
   </header>
   
@@ -230,25 +200,48 @@
     
     <div class="dashboard">
       <div class="card stat-card">
-        <div class="stat-label">Total Customers</div>
-        <div class="stat-value" id="totalCustomers">0</div>
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <div class="stat-label">Total Customers</div>
+          <div class="stat-value" id="totalCustomers">0</div>
+        </div>
       </div>
       <div class="card stat-card" style="border-left-color: #27ae60;">
-        <div class="stat-label">Total Credits</div>
-        <div class="stat-value" id="totalCredits">₹0</div>
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <div class="stat-label">Total Credits</div>
+          <div class="stat-value" id="totalCredits">Rs 0</div>
+        </div>
       </div>
       <div class="card stat-card" style="border-left-color: #e74c3c;">
-        <div class="stat-label">Total Advances</div>
-        <div class="stat-value" id="totalAdvances">₹0</div>
+        <div class="stat-icon">💳</div>
+        <div class="stat-content">
+          <div class="stat-label">Total Advances</div>
+          <div class="stat-value" id="totalAdvances">Rs 0</div>
+        </div>
       </div>
     </div>
     
     <div class="tabs">
-      <button class="tab active" onclick="showTab('customers')">Customers</button>
-      <button class="tab" onclick="showTab('transactions')">Transactions</button>
+      <button class="tab active" onclick="showTab('home')">
+        <span>🏠</span> Home
+      </button>
+      <button class="tab" onclick="showTab('customers')">
+        <span>👤</span> Add Customer
+      </button>
+      <button class="tab" onclick="showTab('transactions')">
+        <span>💸</span> Transactions
+      </button>
     </div>
     
-    <div id="customersTab">
+    <div id="homeTab">
+      <div class="card">
+        <h2 style="margin-bottom: 20px; color: #2c3e50;">All Customers</h2>
+        <div id="customersList"></div>
+      </div>
+    </div>
+    
+    <div id="customersTab" class="hidden">
       <div class="card form-section">
         <h2 style="margin-bottom: 20px; color: #2c3e50;">Add New Customer</h2>
         <form id="customerForm">
@@ -276,26 +269,6 @@
           </div>
           <button type="submit">Add Customer</button>
         </form>
-      </div>
-      
-      <div class="card">
-        <h2 style="margin-bottom: 20px; color: #2c3e50;">All Customers</h2>
-        <div class="table-container">
-          <table id="customersTable">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Credit</th>
-                <th>Advance</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
       </div>
     </div>
     
@@ -351,7 +324,7 @@
   </div>
   
   <script>
-    const BASE_URL = window.location.origin + window.location.pathname.replace(/\\/$/, '');
+    const API_BASE = 'https://wjlyeiqysnjfashdaqpi.supabase.co/functions/v1/express';
     let customers = [];
     let transactions = [];
     
@@ -364,8 +337,9 @@
     
     function showTab(tab) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      event.target.classList.add('active');
+      event.target.closest('.tab').classList.add('active');
       
+      document.getElementById('homeTab').classList.toggle('hidden', tab !== 'home');
       document.getElementById('customersTab').classList.toggle('hidden', tab !== 'customers');
       document.getElementById('transactionsTab').classList.toggle('hidden', tab !== 'transactions');
     }
@@ -373,9 +347,9 @@
     async function loadData() {
       try {
         const [custRes, transRes, statsRes] = await Promise.all([
-          fetch(BASE_URL + '/api/customers'),
-          fetch(BASE_URL + '/api/transactions'),
-          fetch(BASE_URL + '/api/stats')
+          fetch(API_BASE + '/api/customers'),
+          fetch(API_BASE + '/api/transactions'),
+          fetch(API_BASE + '/api/stats')
         ]);
         
         customers = await custRes.json();
@@ -383,10 +357,10 @@
         const stats = await statsRes.json();
         
         document.getElementById('totalCustomers').textContent = stats.totalCustomers;
-        document.getElementById('totalCredits').textContent = '₹' + stats.totalCredits.toFixed(2);
-        document.getElementById('totalAdvances').textContent = '₹' + stats.totalAdvances.toFixed(2);
+        document.getElementById('totalCredits').textContent = 'Rs ' + stats.totalCredits.toFixed(2);
+        document.getElementById('totalAdvances').textContent = 'Rs ' + stats.totalAdvances.toFixed(2);
         
-        renderCustomers();
+        renderCustomersList();
         renderTransactions();
         updateCustomerSelect();
       } catch (err) {
@@ -394,44 +368,63 @@
       }
     }
     
-    function renderCustomers() {
-      const tbody = document.querySelector('#customersTable tbody');
-      tbody.innerHTML = customers.map(c => \`
-        <tr>
-          <td>\${c.id}</td>
-          <td>\${c.name}</td>
-          <td>\${c.email}</td>
-          <td>\${c.phone || '-'}</td>
-          <td>₹\${parseFloat(c.credit_amount).toFixed(2)}</td>
-          <td>₹\${parseFloat(c.advance_payment).toFixed(2)}</td>
-          <td class="actions">
-            <button class="btn-small secondary" onclick="deleteCustomer(\${c.id})">Delete</button>
-          </td>
-        </tr>
-      \`).join('');
+    function renderCustomersList() {
+      const container = document.getElementById('customersList');
+      if (customers.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 40px;">No customers found. Add your first customer!</p>';
+        return;
+      }
+      
+      container.innerHTML = customers.map(c => `
+        <div class="customer-card">
+          <div class="customer-info">
+            <h3>${c.name}</h3>
+            <p>📧 ${c.email}</p>
+            <p>📞 ${c.phone || 'N/A'}</p>
+          </div>
+          <div class="customer-balance">
+            <div class="balance-item">
+              <div class="balance-label">Credit</div>
+              <div class="balance-value" style="color: #27ae60;">Rs ${parseFloat(c.credit_amount).toFixed(2)}</div>
+            </div>
+            <div class="balance-item">
+              <div class="balance-label">Advance</div>
+              <div class="balance-value" style="color: #e74c3c;">Rs ${parseFloat(c.advance_payment).toFixed(2)}</div>
+            </div>
+            <div class="actions" style="margin-top: 10px; justify-content: flex-end;">
+              <button class="btn-small danger" onclick="deleteCustomer(${c.id})">Delete</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
     }
     
     function renderTransactions() {
       const tbody = document.querySelector('#transactionsTable tbody');
+      if (transactions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #7f8c8d; padding: 40px;">No transactions found</td></tr>';
+        return;
+      }
+      
       tbody.innerHTML = transactions.map(t => {
         const customer = customers.find(c => c.id === t.customer_id);
-        return \`
+        return `
           <tr>
-            <td>\${t.id}</td>
-            <td>\${customer ? customer.name : 'Unknown'}</td>
-            <td><span class="badge \${t.type}">\${t.type.toUpperCase()}</span></td>
-            <td>₹\${parseFloat(t.amount).toFixed(2)}</td>
-            <td>\${t.description || '-'}</td>
-            <td>\${new Date(t.created_at).toLocaleDateString()}</td>
+            <td>${t.id}</td>
+            <td>${customer ? customer.name : 'Unknown'}</td>
+            <td><span class="badge ${t.type}">${t.type.toUpperCase()}</span></td>
+            <td>Rs ${parseFloat(t.amount).toFixed(2)}</td>
+            <td>${t.description || '-'}</td>
+            <td>${new Date(t.created_at).toLocaleDateString()}</td>
           </tr>
-        \`;
+        `;
       }).join('');
     }
     
     function updateCustomerSelect() {
       const select = document.getElementById('customerSelect');
       select.innerHTML = '<option value="">Select customer...</option>' + 
-        customers.map(c => \`<option value="\${c.id}">\${c.name} - \${c.email}</option>\`).join('');
+        customers.map(c => `<option value="${c.id}">${c.name} - ${c.email}</option>`).join('');
     }
     
     document.getElementById('customerForm').addEventListener('submit', async (e) => {
@@ -440,7 +433,7 @@
       const data = Object.fromEntries(formData);
       
       try {
-        const res = await fetch(BASE_URL + '/api/customers', {
+        const res = await fetch(API_BASE + '/api/customers', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
@@ -450,6 +443,7 @@
           showMessage('Customer added successfully!');
           e.target.reset();
           loadData();
+          showTab('home');
         } else {
           const err = await res.json();
           showMessage(err.error || 'Error adding customer', 'error');
@@ -465,7 +459,7 @@
       const data = Object.fromEntries(formData);
       
       try {
-        const res = await fetch(BASE_URL + '/api/transactions', {
+        const res = await fetch(API_BASE + '/api/transactions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
@@ -488,7 +482,7 @@
       if (!confirm('Are you sure you want to delete this customer?')) return;
       
       try {
-        const res = await fetch(BASE_URL + \`/api/customers/\${id}\`, { method: 'DELETE' });
+        const res = await fetch(API_BASE + `/api/customers/${id}`, { method: 'DELETE' });
         if (res.ok) {
           showMessage('Customer deleted successfully!');
           loadData();
